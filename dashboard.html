@@ -126,6 +126,159 @@
     .tl-content{font-size:0.74rem;color:var(--gris2);line-height:1.4}
     .tl-title{color:var(--blanc);font-weight:600;font-size:0.76rem;margin-bottom:0.1rem}
     @media(max-width:768px){.roles{grid-template-columns:1fr}.k4,.k5{grid-template-columns:repeat(2,1fr)}.g2,.g3,.g21,.g12{grid-template-columns:1fr}.score-grid{grid-template-columns:repeat(2,1fr)}}
+
+    /* ── MODULE CARTE COMMUNES ───────────── */
+    .map-module {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+    .map-module-title {
+      font-size: .72rem; font-weight: 600;
+      color: var(--texte); letter-spacing: .08em;
+      text-transform: uppercase; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .map-container {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1rem;
+      min-height: 420px;
+    }
+    .map-svg-wrap {
+      position: relative;
+      background: #07090E;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(201,168,76,.1);
+    }
+    .map-svg-wrap svg {
+      width: 100%; height: 100%;
+      display: block;
+    }
+    /* Communes dans le dashboard — interactives */
+    .dcom {
+      fill: rgba(201,168,76,.04);
+      stroke: rgba(201,168,76,.2);
+      stroke-width: .8;
+      stroke-linejoin: round;
+      cursor: pointer;
+      transition: fill .2s, stroke .2s, filter .2s;
+    }
+    .dcom:hover, .dcom.hovered {
+      fill: rgba(201,168,76,.18);
+      stroke: rgba(201,168,76,.7);
+      filter: drop-shadow(0 0 5px rgba(201,168,76,.4));
+    }
+    .dcom.selected {
+      fill: rgba(201,168,76,.22);
+      stroke: #EDD485;
+      stroke-width: 1.4;
+      filter: drop-shadow(0 0 8px rgba(201,168,76,.5));
+    }
+    .dcom-main { stroke-width: 1.1; }
+    .dcom-coast { stroke: rgba(0,200,240,.25); }
+    .dcom-coast:hover { stroke: rgba(0,200,240,.7); fill: rgba(0,200,240,.08); }
+    .dcom-coast.selected { stroke: #00C8F0; }
+
+    /* Panneau de données commune */
+    .com-panel {
+      display: flex; flex-direction: column; gap: .7rem;
+    }
+    .com-panel-header {
+      background: rgba(201,168,76,.07);
+      border: 1px solid rgba(201,168,76,.18);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+    }
+    .com-panel-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem; font-weight: 800;
+      color: var(--or); margin-bottom: .2rem;
+    }
+    .com-panel-type {
+      font-size: .62rem; color: var(--gris2);
+      letter-spacing: .1em; text-transform: uppercase;
+    }
+    .com-kpis {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: .5rem;
+    }
+    .com-kpi {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .7rem .8rem;
+    }
+    .com-kpi-label {
+      font-size: .55rem; color: var(--gris2);
+      text-transform: uppercase; letter-spacing: .1em;
+      margin-bottom: .3rem;
+    }
+    .com-kpi-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--texte);
+    }
+    .com-kpi-val.gold { color: var(--or); }
+    .com-kpi-val.cyan { color: var(--cyan); }
+    .com-kpi-val.red  { color: var(--rouge); }
+    .com-kpi-val.green{ color: var(--vert); }
+
+    .com-tags {
+      display: flex; flex-wrap: wrap; gap: .35rem;
+    }
+    .com-tag {
+      font-size: .55rem; padding: .25rem .6rem;
+      border-radius: 100px;
+      background: rgba(201,168,76,.08);
+      border: 1px solid rgba(201,168,76,.2);
+      color: var(--or); letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .com-tag.cy {
+      background: rgba(0,200,240,.08);
+      border-color: rgba(0,200,240,.2);
+      color: var(--cyan);
+    }
+    .com-tag.ro {
+      background: rgba(255,80,80,.08);
+      border-color: rgba(255,80,80,.2);
+      color: var(--rouge);
+    }
+    .com-tag.ve {
+      background: rgba(0,232,122,.08);
+      border-color: rgba(0,232,122,.2);
+      color: var(--vert);
+    }
+
+    .com-placeholder {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 100%; color: var(--gris2);
+      font-size: .75rem; gap: .5rem;
+      text-align: center; padding: 1rem;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+    }
+    .com-placeholder-icon { font-size: 2rem; opacity: .4; }
+
+    /* Map labels */
+    .dmap-txt {
+      font-family: monospace;
+      fill: rgba(201,168,76,.35);
+      font-size: 5px; letter-spacing: .15em;
+      pointer-events: none;
+      text-transform: uppercase;
+    }
+    .dmap-beacon { fill: #D4AD5A; }
+    .dmap-ret { stroke: rgba(201,168,76,.05); stroke-width: .3; stroke-dasharray: 3 6; }
+
+    @media(max-width:900px) {
+      .map-container { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -731,7 +884,90 @@ directeur: [
 </div>`,
 
 // Onglet 3 — Données communes
-`<div class="abanner ve">📊 <strong>Données consolidées par commune</strong> — Sources : INSEE RP 2022 · BANATIC 2024 · DVF 2024 · SIRENE</div>
+`<div class="map-module">
+  <div class="map-module-title">
+    <span style="color:var(--or)">⬡</span>
+    Carte interactive — 37 communes du Grand Narbonne
+    <span class="b bvi" style="margin-left:auto">INSEE · BANATIC · DVF 2024</span>
+  </div>
+  <div class="map-container">
+    <!-- SVG Carte -->
+    <div class="map-svg-wrap">
+      <svg viewBox="0 0 580 480" id="dashMap" xmlns="http://www.w3.org/2000/svg">
+        <!-- Grille -->
+        <line class="dmap-ret" x1="0" y1="120" x2="580" y2="120"/>
+        <line class="dmap-ret" x1="0" y1="240" x2="580" y2="240"/>
+        <line class="dmap-ret" x1="0" y1="360" x2="580" y2="360"/>
+        <line class="dmap-ret" x1="145" y1="0" x2="145" y2="480"/>
+        <line class="dmap-ret" x1="290" y1="0" x2="290" y2="480"/>
+        <line class="dmap-ret" x1="435" y1="0" x2="435" y2="480"/>
+
+        <!-- ═══ 37 COMMUNES ═══ -->
+        <polygon class="dcom" data-id="mailhac"      data-n="Mailhac"           points="58,55  108,45  118,72  95,90  60,84"/>
+        <polygon class="dcom" data-id="ornaisons"    data-n="Ornaisons"         points="108,45  162,38  172,65  148,88  118,82"/>
+        <polygon class="dcom" data-id="bizanet"      data-n="Bizanet"           points="162,38  212,33  220,60  198,84  172,80"/>
+        <polygon class="dcom" data-id="montseret"    data-n="Montséret"         points="212,33  262,28  270,56  248,80  222,76"/>
+        <polygon class="dcom" data-id="thezan"       data-n="Thézan-des-C."    points="262,28  315,25  322,52  300,76  272,72"/>
+        <polygon class="dcom" data-id="villeseque"   data-n="Villesèque-des-C." points="315,25  368,23  374,50  350,74  322,70"/>
+        <polygon class="dcom" data-id="durban"       data-n="Durban-Corbières"  points="368,23  420,21  428,48  405,72  374,68"/>
+        <polygon class="dcom" data-id="roquefort"    data-n="Roquefort-des-C."  points="420,21  472,19  478,46  458,70  428,66"/>
+        <polygon class="dcom" data-id="villeneuve"   data-n="Villeneuve-les-C." points="472,19  524,21  528,48  506,72  478,68"/>
+
+        <polygon class="dcom" data-id="canet"        data-n="Canet-d'Aude"     points="58,84   95,90  100,124  72,140  45,128"/>
+        <polygon class="dcom" data-id="moussan"      data-n="Moussan"           points="95,90  148,88  152,120  122,140  100,132"/>
+        <polygon class="dcom" data-id="nevian"       data-n="Névian"            points="148,88  198,84  202,116  172,140  152,128"/>
+        <polygon class="dcom" data-id="marcorignan"  data-n="Marcorignan"       points="198,84  248,80  252,112  222,136  202,128"/>
+        <polygon class="dcom" data-id="montredon"    data-n="Montredon"         points="248,80  300,76  304,108  274,132  252,126"/>
+        <polygon class="dcom" data-id="fabrezan"     data-n="Fabrezan"          points="300,76  350,74  354,106  324,130  304,124"/>
+        <polygon class="dcom" data-id="ferrals"      data-n="Ferrals-les-C."   points="350,74  405,72  408,104  378,128  354,122"/>
+        <polygon class="dcom" data-id="coustouge"    data-n="Coustouge"         points="405,72  458,70  460,102  432,126  408,120"/>
+        <polygon class="dcom" data-id="davejean"     data-n="Davejean"          points="458,70  524,72  525,104  495,128  460,120"/>
+
+        <polygon class="dcom" data-id="vinassan"     data-n="Vinassan"          points="45,128  72,140  68,174  40,184  22,165"/>
+        <polygon class="dcom" data-id="coursan"      data-n="Coursan"           points="72,140  122,140  120,174  88,190  68,180"/>
+        <polygon class="dcom" data-id="cuxac"        data-n="Cuxac-d'Aude"     points="122,140  172,140  170,174  138,190  120,180"/>
+        <polygon class="dcom" data-id="salles"       data-n="Salles-d'Aude"    points="172,140  222,136  220,170  188,188  170,180"/>
+
+        <polygon class="dcom dcom-main" data-id="narbonne" data-n="Narbonne"   points="222,136 274,132 278,168 268,208 238,230 200,232 170,215 165,178 188,162"/>
+
+        <polygon class="dcom" data-id="armissan"     data-n="Armissan"          points="274,132  324,130  322,164  292,182  278,174"/>
+        <polygon class="dcom" data-id="bages"        data-n="Bages"             points="324,130  378,128  375,162  345,180  322,176"/>
+        <polygon class="dcom" data-id="peyriac"      data-n="Peyriac-de-Mer"   points="378,128  432,126  428,160  398,178  375,174"/>
+        <polygon class="dcom" data-id="sigean"       data-n="Sigean"            points="432,126  495,128  490,163  460,182  428,176"/>
+
+        <polygon class="dcom" data-id="fleury"       data-n="Fleury"            points="40,184  68,180  65,218  38,232  18,215"/>
+        <polygon class="dcom" data-id="saintmarcel"  data-n="Saint-Marcel"      points="68,180  120,180  118,216  85,232  65,222"/>
+        <polygon class="dcom" data-id="stemariemerh" data-n="Ste-Marie-la-Mer" points="120,180  170,180  168,218  135,234  118,222"/>
+
+        <polygon class="dcom dcom-coast" data-id="gruissan" data-n="Gruissan"  points="135,234 170,228 200,232 205,272 178,295 142,290 120,268 115,248"/>
+        <polygon class="dcom dcom-coast" data-id="portlanouvelle" data-n="Port-la-Nouvelle" points="238,230 268,224 278,262 265,294 235,302 210,288 205,260"/>
+
+        <polygon class="dcom" data-id="leucate"      data-n="Leucate"           points="490,163  545,166  548,204  518,222  490,215"/>
+        <polygon class="dcom" data-id="lapalme"      data-n="La Palme"          points="460,182  490,178  492,218  462,236  438,226"/>
+        <polygon class="dcom" data-id="caves"        data-n="Caves"             points="428,176  462,173  462,210  432,228  408,218"/>
+        <polygon class="dcom" data-id="fitou"        data-n="Fitou"             points="460,210  490,208  492,244  462,262  440,250"/>
+
+        <!-- Beacon Narbonne -->
+        <circle cx="222" cy="190" r="3" fill="#D4AD5A" opacity=".9"
+                style="filter:drop-shadow(0 0 4px rgba(212,173,90,.8))"/>
+        <circle cx="222" cy="190" r="1" fill="#FFF8E0"/>
+
+        <!-- Labels -->
+        <text class="dmap-txt" x="222" y="198" text-anchor="middle" style="font-size:5.5px;fill:rgba(212,173,90,.6)">NARBONNE</text>
+        <text class="dmap-txt" x="290" y="16" text-anchor="middle" style="fill:rgba(201,168,76,.18);letter-spacing:.3em">GRAND NARBONNE · 37 COMMUNES</text>
+      </svg>
+    </div>
+
+    <!-- Panneau données -->
+    <div class="com-panel" id="comPanel">
+      <div class="com-placeholder">
+        <div class="com-placeholder-icon">⬡</div>
+        <div>Cliquez sur une commune<br>pour afficher ses données</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="abanner ve">📊 <strong>Données consolidées par commune</strong> — Sources : INSEE RP 2022 · BANATIC 2024 · DVF 2024 · SIRENE</div>
 <div class="krow k4">
   <div class="kpi vi"><div class="kl">Communes membres</div><div class="kv">37</div><div class="kd"><span>846,6 km²</span></div></div>
   <div class="kpi or"><div class="kl">Commune principale</div><div class="kv">57 765</div><div class="kd"><span>Narbonne — 42%</span></div></div>
@@ -939,6 +1175,102 @@ function runIA(){
 document.getElementById('iain').addEventListener('keypress',e=>{if(e.key==='Enter')runIA();});
 function tick(){document.getElementById('clk').textContent=new Date().toLocaleTimeString('fr-FR');}
 setInterval(tick,1000);tick();
+
+/* ── MODULE CARTE COMMUNES DASHBOARD ──── */
+const COM_DATA = {
+  narbonne:       { n:"Narbonne",           pop:57765, area:"17 332 ha", immo:"2 450€/m²", chom:"10.8%", type:"Ville-centre",    tags:[["Port 2030","cy"],["QPV","ro"],["Pôle emploi","or"]], note:"Chef-lieu d'arrondissement. Moteur économique du territoire. Chômage QPV à 26% chez les 18-24 ans." },
+  gruissan:       { n:"Gruissan",           pop:5087,  area:"4 762 ha",  immo:"3 200€/m²", chom:"8.2%",  type:"Littoral",        tags:[["Tourisme","cy"],["Station class.","or"]], note:"Station balnéaire classée. Fort attrait touristique, résidences secondaires dominantes (60%)." },
+  portlanouvelle: { n:"Port-la-Nouvelle",   pop:5843,  area:"1 580 ha",  immo:"1 950€/m²", chom:"12.1%", type:"Port industriel", tags:[["Éolien offshore","cy"],["Port 2030","or"],["Industrie","ro"]], note:"Hub stratégique éolien offshore. 200+ emplois attendus d'ici 2030. Reconversion industrielle en cours." },
+  coursan:        { n:"Coursan",            pop:6014,  area:"4 680 ha",  immo:"1 750€/m²", chom:"9.8%",  type:"Périurbain",      tags:[["Croissance","ve"],["Résidentiel","or"]], note:"2ème commune en population. Dynamique résidentielle forte, attractivité familiale." },
+  leucate:        { n:"Leucate",            pop:4380,  area:"3 042 ha",  immo:"2 900€/m²", chom:"7.5%",  type:"Littoral",        tags:[["Tourisme","cy"],["Étang","or"]], note:"Commune littorale avec étang de Leucate. Fort tourisme estival, économie saisonnière." },
+  cuxac:          { n:"Cuxac-d'Aude",       pop:4512,  area:"2 890 ha",  immo:"1 680€/m²", chom:"9.2%",  type:"Périurbain",      tags:[["Résidentiel","or"],["Viticole","ve"]], note:"Zone périurbaine de Narbonne. Mixité résidentielle et viticole." },
+  sigean:         { n:"Sigean",             pop:4722,  area:"8 115 ha",  immo:"1 820€/m²", chom:"10.2%", type:"Étangs",          tags:[["Réserve africaine","cy"],["Étangs","or"]], note:"Commune des étangs. Zoo safari et réserve africaine = atout touristique majeur." },
+  bages:          { n:"Bages",              pop:1050,  area:"3 125 ha",  immo:"2 100€/m²", chom:"7.8%",  type:"Étangs",          tags:[["Village prestige","or"],["Étang","cy"]], note:"Village perché sur l'étang de Bages. Architecture remarquable, attrait résidentiel haut de gamme." },
+  vinassan:       { n:"Vinassan",           pop:2890,  area:"1 245 ha",  immo:"1 620€/m²", chom:"8.9%",  type:"Périurbain",      tags:[["Résidentiel","or"]], note:"Commune périurbaine en croissance. Bonne desserte routière." },
+  armissan:       { n:"Armissan",           pop:1128,  area:"2 450 ha",  immo:"1 580€/m²", chom:"8.5%",  type:"Viticole",        tags:[["Viticulture","ve"],["Montagne de la Clape","or"]], note:"Au pied de la Montagne de la Clape. AOC La Clape, viticulture de qualité." },
+  fleury:         { n:"Fleury",             pop:2140,  area:"4 820 ha",  immo:"1 850€/m²", chom:"9.1%",  type:"Littoral",        tags:[["Vendres plage","cy"],["Tourisme","or"]], note:"Commune avec accès mer (Vendres). Tourisme balnéaire secondaire." },
+  moussan:        { n:"Moussan",            pop:3680,  area:"1 980 ha",  immo:"1 700€/m²", chom:"9.4%",  type:"Périurbain",      tags:[["Résidentiel","or"],["Croissance","ve"]], note:"Commune périurbaine dynamique. Fort développement résidentiel ces 10 dernières années." },
+  peyriac:        { n:"Peyriac-de-Mer",     pop:1175,  area:"5 280 ha",  immo:"1 920€/m²", chom:"8.0%",  type:"Étangs",          tags:[["Étang","cy"],["Pêche","or"]], note:"Village de pêcheurs sur l'étang de Bages-Sigean. Patrimoine naturel classé." },
+  canet:          { n:"Canet-d'Aude",       pop:2190,  area:"1 890 ha",  immo:"1 640€/m²", chom:"9.6%",  type:"Périurbain",      tags:[["Résidentiel","or"]], note:"Commune périurbaine au nord de Narbonne." },
+  bizanet:        { n:"Bizanet",            pop:1380,  area:"3 420 ha",  immo:"1 520€/m²", chom:"8.3%",  type:"Viticole",        tags:[["Viticulture","ve"],["Rural","or"]], note:"Commune viticole des Corbières. AOC Corbières." },
+  ornaisons:      { n:"Ornaisons",          pop:1045,  area:"2 890 ha",  immo:"1 480€/m²", chom:"8.1%",  type:"Viticole",        tags:[["Viticulture","ve"]], note:"Corbières viticoles. Coopérative viticole active." },
+  mailhac:        { n:"Mailhac",            pop:685,   area:"3 125 ha",  immo:"1 380€/m²", chom:"9.2%",  type:"Viticole",        tags:[["Rural","or"],["Viticulture","ve"]], note:"Petit village viticole. Site archéologique notable." },
+  montseret:      { n:"Montséret",          pop:398,   area:"2 240 ha",  immo:"1 320€/m²", chom:"8.8%",  type:"Viticole",        tags:[["Rural","or"]], note:"Commune rurale viticole des Corbières." },
+  thezan:         { n:"Thézan-des-C.",      pop:890,   area:"3 680 ha",  immo:"1 420€/m²", chom:"8.6%",  type:"Viticole",        tags:[["Viticulture","ve"],["Corbières","or"]], note:"Corbières viticoles. Cave coopérative." },
+  villeseque:     { n:"Villesèque-des-C.",  pop:542,   area:"4 120 ha",  immo:"1 350€/m²", chom:"9.0%",  type:"Viticole",        tags:[["Rural","or"]], note:"Commune rurale en Corbières." },
+  durban:         { n:"Durban-Corbières",   pop:720,   area:"5 840 ha",  immo:"1 400€/m²", chom:"9.5%",  type:"Viticole",        tags:[["Château","or"],["Corbières","ve"]], note:"Château médiéval remarquable. AOC Corbières." },
+  roquefort:      { n:"Roquefort-des-C.",   pop:685,   area:"4 380 ha",  immo:"1 360€/m²", chom:"9.3%",  type:"Viticole",        tags:[["Rural","or"]], note:"Commune viticole des Corbières extérieures." },
+  villeneuve:     { n:"Villeneuve-les-C.",  pop:628,   area:"5 120 ha",  immo:"1 340€/m²", chom:"9.8%",  type:"Viticole",        tags:[["Rural","or"]], note:"Corbières. Commune rurale viticole." },
+  fabrezan:       { n:"Fabrezan",           pop:1285,  area:"2 890 ha",  immo:"1 450€/m²", chom:"8.7%",  type:"Viticole",        tags:[["Viticulture","ve"],["Bourg","or"]], note:"Bourg viticole des Corbières. Services de proximité." },
+  ferrals:        { n:"Ferrals-les-C.",     pop:980,   area:"4 560 ha",  immo:"1 400€/m²", chom:"9.1%",  type:"Viticole",        tags:[["Rural","or"],["Corbières","ve"]], note:"Corbières viticoles." },
+  coustouge:      { n:"Coustouge",          pop:285,   area:"3 210 ha",  immo:"1 280€/m²", chom:"9.5%",  type:"Rural",           tags:[["Rural","or"]], note:"Petite commune rurale des Corbières." },
+  davejean:       { n:"Davejean",           pop:248,   area:"3 850 ha",  immo:"1 260€/m²", chom:"9.8%",  type:"Rural",           tags:[["Rural","or"]], note:"Commune rurale à l'est des Corbières." },
+  fitou:          { n:"Fitou",              pop:980,   area:"4 280 ha",  immo:"1 680€/m²", chom:"8.4%",  type:"Viticole",        tags:[["AOC Fitou","or"],["Prestige","cy"]], note:"AOC Fitou mondialement reconnu. Viticulture de réputation internationale." },
+  lapalme:        { n:"La Palme",           pop:890,   area:"2 640 ha",  immo:"1 780€/m²", chom:"8.0%",  type:"Littoral",        tags:[["Étang","cy"],["Littoral","or"]], note:"Commune littorale avec étang de La Palme. Accès mer et nature." },
+  caves:          { n:"Caves",              pop:485,   area:"3 480 ha",  immo:"1 420€/m²", chom:"9.2%",  type:"Viticole",        tags:[["Rural","or"],["Corbières","ve"]], note:"Commune viticole entre Corbières et littoral." },
+  nevian:         { n:"Névian",             pop:1245,  area:"2 780 ha",  immo:"1 520€/m²", chom:"8.5%",  type:"Viticole",        tags:[["Viticulture","ve"],["Périurbain","or"]], note:"Commune viticole proche de Narbonne." },
+  marcorignan:    { n:"Marcorignan",        pop:1560,  area:"2 340 ha",  immo:"1 580€/m²", chom:"8.8%",  type:"Viticole",        tags:[["Résidentiel","or"],["Viticulture","ve"]], note:"Commune viticole et résidentielle en croissance." },
+  montredon:      { n:"Montredon",          pop:980,   area:"3 250 ha",  immo:"1 500€/m²", chom:"8.9%",  type:"Viticole",        tags:[["La Clape","or"],["Viticulture","ve"]], note:"Montagne de la Clape. Viticulture AOC La Clape, paysages remarquables." },
+  saintmarcel:    { n:"Saint-Marcel",       pop:1840,  area:"2 180 ha",  immo:"1 620€/m²", chom:"9.0%",  type:"Périurbain",      tags:[["Résidentiel","or"]], note:"Commune périurbaine résidentielle." },
+  salles:         { n:"Salles-d'Aude",      pop:2140,  area:"3 560 ha",  immo:"1 660€/m²", chom:"9.3%",  type:"Viticole",        tags:[["Viticulture","ve"],["Résidentiel","or"]], note:"Commune viticole et résidentielle. Cave coopérative active." },
+  stemariemerh:   { n:"Ste-Marie-la-Mer",   pop:820,   area:"1 680 ha",  immo:"2 200€/m²", chom:"7.2%",  type:"Littoral",        tags:[["Plage","cy"],["Résidences 2nd","or"]], note:"Commune littorale. Fort taux de résidences secondaires. Économie touristique." },
+};
+
+function showCommune(id) {
+  const d = COM_DATA[id];
+  if(!d) return;
+
+  // Désélectionner tout
+  document.querySelectorAll('.dcom').forEach(el => el.classList.remove('selected'));
+  // Sélectionner la commune cliquée
+  document.querySelectorAll(`[data-id="${id}"]`).forEach(el => el.classList.add('selected'));
+
+  const chomColor = parseFloat(d.chom) > 10 ? 'red' : parseFloat(d.chom) > 8.5 ? 'gold' : 'green';
+
+  document.getElementById('comPanel').innerHTML = `
+    <div class="com-panel-header">
+      <div class="com-panel-name">${d.n}</div>
+      <div class="com-panel-type">${d.type}</div>
+    </div>
+    <div class="com-kpis">
+      <div class="com-kpi">
+        <div class="com-kpi-label">Population</div>
+        <div class="com-kpi-val gold">${d.pop.toLocaleString('fr-FR')}</div>
+      </div>
+      <div class="com-kpi">
+        <div class="com-kpi-label">Superficie</div>
+        <div class="com-kpi-val">${d.area}</div>
+      </div>
+      <div class="com-kpi">
+        <div class="com-kpi-label">Immo moyen</div>
+        <div class="com-kpi-val cyan">${d.immo}</div>
+      </div>
+      <div class="com-kpi">
+        <div class="com-kpi-label">Chômage</div>
+        <div class="com-kpi-val ${chomColor}">${d.chom}</div>
+      </div>
+    </div>
+    <div class="com-tags">
+      ${d.tags.map(([t,c])=>`<span class="com-tag ${c}">${t}</span>`).join('')}
+    </div>
+    <div style="font-size:.7rem;color:var(--gris2);line-height:1.6;padding:.8rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px">
+      ${d.note}
+    </div>
+    <div style="font-size:.52rem;color:var(--gris3);letter-spacing:.08em;text-transform:uppercase">
+      Sources : INSEE RP 2022 · DVF 2024 · France Travail
+    </div>
+  `;
+}
+
+// Activer les communes cliquables
+window.addEventListener('load', () => {
+  document.querySelectorAll('.dcom').forEach(el => {
+    el.addEventListener('click', () => showCommune(el.dataset.id));
+    el.addEventListener('mouseenter', () => el.classList.add('hovered'));
+    el.addEventListener('mouseleave', () => el.classList.remove('hovered'));
+  });
+});
+
 </script>
 </body>
 </html>
