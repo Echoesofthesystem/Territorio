@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TERRITORIO — Grand Narbonne</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root{--bg:#07090E;--surface:#0C0F18;--surface2:#111520;--border:#1A2030;--border2:#222840;--or:#C9A84C;--or2:#E8C96A;--cyan:#00C8F0;--vert:#00E87A;--rouge:#FF3D50;--violet:#A78BFA;--blanc:#E8EEF8;--gris:#4A5870;--gris2:#7A90A8}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--blanc);min-height:100vh;overflow-x:hidden}
+    #login{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
+    .glow{position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+    .login-logo{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:0.2em;margin-bottom:0.3rem;position:relative;z-index:1}
+    .login-logo span{color:var(--or)}
+    .login-sub{font-size:0.78rem;color:var(--gris2);letter-spacing:0.12em;margin-bottom:0.4rem;font-family:'JetBrains Mono',monospace;position:relative;z-index:1}
+    .live-pill{display:flex;align-items:center;gap:0.4rem;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);padding:0.25rem 1rem;margin-bottom:2.5rem;font-size:0.68rem;color:var(--or);font-family:'JetBrains Mono',monospace;position:relative;z-index:1}
+    .dot{width:5px;height:5px;background:var(--vert);border-radius:50%;box-shadow:0 0 6px var(--vert);animation:blink 2s ease infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+    .login-heading{font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;color:var(--gris2);letter-spacing:0.12em;margin-bottom:1.4rem;text-transform:uppercase;position:relative;z-index:1}
+    .roles{display:grid;grid-template-columns:repeat(2,1fr);gap:0.9rem;max-width:800px;width:100%;position:relative;z-index:1}
+    .rc{background:var(--surface);border:1px solid var(--border2);padding:1.6rem;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden}
+    .rc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;transform:scaleX(0);transition:transform 0.3s}
+    .rc.r1::before{background:var(--or)}.rc.r2::before{background:var(--cyan)}.rc.r3::before{background:var(--vert)}.rc.r4::before{background:var(--violet)}
+    .rc:hover{transform:translateY(-3px)}.rc:hover::before{transform:scaleX(1)}
+    .rc.r1:hover{border-color:rgba(201,168,76,0.35);box-shadow:0 8px 28px rgba(201,168,76,0.1)}
+    .rc.r2:hover{border-color:rgba(0,200,240,0.35);box-shadow:0 8px 28px rgba(0,200,240,0.1)}
+    .rc.r3:hover{border-color:rgba(0,232,122,0.35);box-shadow:0 8px 28px rgba(0,232,122,0.1)}
+    .rc.r4:hover{border-color:rgba(167,139,250,0.35);box-shadow:0 8px 28px rgba(167,139,250,0.1)}
+    .rc-icon{font-size:1.9rem;margin-bottom:0.7rem}.rc-name{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:0.25rem}
+    .rc.r1 .rc-name{color:var(--or)}.rc.r2 .rc-name{color:var(--cyan)}.rc.r3 .rc-name{color:var(--vert)}.rc.r4 .rc-name{color:var(--violet)}
+    .rc-desc{font-size:0.78rem;color:var(--gris2);line-height:1.5;margin-bottom:0.9rem}
+    .rc-tags{display:flex;flex-wrap:wrap;gap:0.3rem}
+    .rc-tag{font-size:0.6rem;padding:0.12rem 0.45rem;border:1px solid var(--border2);color:var(--gris);font-family:'JetBrains Mono',monospace}
+    .login-note{margin-top:1.8rem;font-size:0.62rem;color:var(--gris);font-family:'JetBrains Mono',monospace;text-align:center;position:relative;z-index:1}
+    #app{display:none;flex-direction:column;min-height:100vh}
+    #app.on{display:flex}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:0 1.4rem;height:48px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;flex-shrink:0}
+    .tl{display:flex;align-items:center;gap:0.8rem}
+    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:0.92rem;letter-spacing:0.18em}
+    .logo span{color:var(--or)}
+    .tpill{display:flex;align-items:center;gap:0.35rem;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);padding:0.18rem 0.65rem;font-size:0.62rem;color:var(--or);font-family:'JetBrains Mono',monospace}
+    .rpill{padding:0.18rem 0.65rem;border:1px solid;font-size:0.62rem;font-family:'JetBrains Mono',monospace}
+    .tr2{display:flex;align-items:center;gap:0.8rem;font-size:0.62rem;color:var(--gris);font-family:'JetBrains Mono',monospace}
+    .clk{color:var(--cyan)}
+    .bbtn{color:var(--gris);text-decoration:none;font-size:0.62rem;border:1px solid var(--border2);padding:0.18rem 0.65rem;transition:all 0.2s;cursor:pointer;background:none;font-family:'JetBrains Mono',monospace}
+    .bbtn:hover{color:var(--or);border-color:var(--or)}
+    .lbtn{color:var(--gris);border:1px solid var(--border2);padding:0.18rem 0.65rem;font-size:0.62rem;cursor:pointer;background:none;font-family:'JetBrains Mono',monospace;transition:all 0.2s}
+    .lbtn:hover{color:var(--rouge);border-color:var(--rouge)}
+    .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.4rem;overflow-x:auto;flex-shrink:0}
+    .tbtn{display:flex;align-items:center;gap:0.35rem;padding:0.7rem 1.1rem;font-size:0.76rem;font-family:'DM Sans',sans-serif;color:var(--gris2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+    .tbtn:hover{color:var(--blanc)}.tbtn.on{color:var(--or);border-bottom-color:var(--or)}
+    .iabar{background:var(--surface2);border-bottom:1px solid var(--border);padding:0.6rem 1.4rem;display:flex;align-items:center;gap:0.7rem;flex-shrink:0}
+    .ialabel{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--or);letter-spacing:0.12em;white-space:nowrap}
+    .iawrap{flex:1;display:flex;border:1px solid var(--border2);max-width:620px}
+    .iainput{flex:1;background:var(--surface);border:none;color:var(--blanc);padding:0.48rem 0.75rem;font-family:'DM Sans',sans-serif;font-size:0.76rem;outline:none}
+    .iainput::placeholder{color:var(--gris)}
+    .iabtn{background:var(--or);color:var(--bg);border:none;padding:0.48rem 0.9rem;font-family:'Syne',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;cursor:pointer;transition:background 0.15s}
+    .iabtn:hover{background:var(--or2)}
+    .chips{display:flex;gap:0.3rem;flex-wrap:wrap}
+    .chip{padding:0.22rem 0.55rem;border:1px solid var(--border2);font-size:0.6rem;color:var(--gris2);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+    .chip:hover{border-color:var(--or);color:var(--or)}
+    .iaresp{background:var(--surface);border-left:2px solid var(--or);border-bottom:1px solid var(--border);padding:0.75rem 1.4rem;font-size:0.76rem;color:var(--gris2);line-height:1.7;display:none}
+    .iaresp.on{display:block}.iaresp strong{color:var(--or)}.iaresp em{color:var(--gris);font-size:0.7rem}
+    .main{padding:1.1rem 1.4rem;overflow-y:auto;flex:1}
+    .panels{position:relative}
+    .panel{display:none}.panel.on{display:block}
+    .krow{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:1.1rem}
+    .k4{grid-template-columns:repeat(4,1fr)}.k3{grid-template-columns:repeat(3,1fr)}.k5{grid-template-columns:repeat(5,1fr)}
+    .kpi{background:var(--surface);padding:0.95rem 1.1rem;position:relative;transition:background 0.2s}
+    .kpi:hover{background:var(--surface2)}
+    .kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+    .kpi.or::after{background:var(--or)}.kpi.cy::after{background:var(--cyan)}.kpi.ve::after{background:var(--vert)}.kpi.ro::after{background:var(--rouge)}.kpi.vi::after{background:var(--violet)}
+    .kl{font-size:0.58rem;letter-spacing:0.12em;color:var(--gris);text-transform:uppercase;margin-bottom:0.55rem;font-family:'JetBrains Mono',monospace}
+    .kv{font-family:'Syne',sans-serif;font-size:1.65rem;font-weight:800;line-height:1;margin-bottom:0.35rem}
+    .kpi.or .kv{color:var(--or)}.kpi.cy .kv{color:var(--cyan)}.kpi.ve .kv{color:var(--vert)}.kpi.ro .kv{color:var(--rouge)}.kpi.vi .kv{color:var(--violet)}
+    .kd{font-size:0.65rem;color:var(--gris2);display:flex;gap:0.3rem}
+    .up{color:var(--vert)}.dn{color:var(--rouge)}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:1.1rem}
+    .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-bottom:1.1rem}
+    .g21{display:grid;grid-template-columns:2fr 1fr;gap:1px;background:var(--border);margin-bottom:1.1rem}
+    .g12{display:grid;grid-template-columns:1fr 2fr;gap:1px;background:var(--border);margin-bottom:1.1rem}
+    .card{background:var(--surface);padding:1rem}
+    .ct{font-size:0.62rem;letter-spacing:0.1em;color:var(--gris2);text-transform:uppercase;margin-bottom:0.9rem;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace}
+    .b{font-size:0.55rem;padding:0.1rem 0.4rem;border:1px solid}
+    .bor{color:var(--or);border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06)}
+    .bcy{color:var(--cyan);border-color:rgba(0,200,240,0.3);background:rgba(0,200,240,0.06)}
+    .bve{color:var(--vert);border-color:rgba(0,232,122,0.3);background:rgba(0,232,122,0.06)}
+    .bro{color:var(--rouge);border-color:rgba(255,61,80,0.3);background:rgba(255,61,80,0.06)}
+    .bvi{color:var(--violet);border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.06)}
+    canvas{max-height:195px;width:100%!important}
+    .tbl{width:100%;border-collapse:collapse;font-size:0.73rem}
+    .tbl th{font-size:0.56rem;letter-spacing:0.1em;color:var(--gris);text-transform:uppercase;padding:0.42rem 0.65rem;text-align:left;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace}
+    .tbl td{padding:0.44rem 0.65rem;border-bottom:1px solid rgba(26,32,48,0.5);color:var(--gris2)}
+    .tbl tr:last-child td{border:none}.tbl tr:hover td{background:rgba(201,168,76,0.02);color:var(--blanc)}.tbl .val{color:var(--blanc);font-weight:500}
+    .sig{display:flex;gap:0.65rem;padding:0.7rem;border:1px solid var(--border);background:var(--surface2);margin-bottom:0.45rem}
+    .sig:last-child{margin:0}
+    .sdot{width:6px;height:6px;border-radius:50%;margin-top:4px;flex-shrink:0}
+    .sdot.ro{background:var(--rouge);box-shadow:0 0 6px var(--rouge)}.sdot.cy{background:var(--cyan);box-shadow:0 0 6px var(--cyan)}.sdot.ve{background:var(--vert);box-shadow:0 0 6px var(--vert)}.sdot.or{background:var(--or);box-shadow:0 0 6px var(--or)}.sdot.vi{background:var(--violet);box-shadow:0 0 6px var(--violet)}
+    .sbody{font-size:0.73rem;line-height:1.45}.stitle{color:var(--blanc);font-weight:600;margin-bottom:0.12rem;font-size:0.76rem}.stext{color:var(--gris2)}
+    .prog{margin-bottom:0.8rem}.prog:last-child{margin:0}
+    .ph{display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:0.28rem}
+    .pl{color:var(--gris2)}.pv{color:var(--blanc);font-weight:500;font-family:'JetBrains Mono',monospace}
+    .pt{height:3px;background:var(--border2);overflow:hidden}.pf{height:100%;transition:width 1.5s ease}
+    .sg{display:grid;grid-template-columns:1fr 1fr;gap:0.45rem}
+    .sb{background:var(--surface2);border:1px solid var(--border);padding:0.55rem}
+    .sbl{font-size:0.56rem;color:var(--gris);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.2rem;font-family:'JetBrains Mono',monospace}
+    .sbv{font-size:0.95rem;font-weight:600;font-family:'Syne',sans-serif;color:var(--blanc)}.sbs{font-size:0.58rem;color:var(--gris2);margin-top:0.08rem}
+    .abanner{display:flex;align-items:center;gap:0.7rem;padding:0.65rem 0.9rem;margin-bottom:1.1rem;border:1px solid;font-size:0.76rem}
+    .abanner.ro{border-color:rgba(255,61,80,0.3);background:rgba(255,61,80,0.06);color:var(--rouge)}
+    .abanner.or{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06);color:var(--or)}
+    .abanner.ve{border-color:rgba(0,232,122,0.3);background:rgba(0,232,122,0.06);color:var(--vert)}
+    @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .panel.on .kpi,.panel.on .card{animation:fu 0.35s ease both}
+    .panel.on .kpi:nth-child(1){animation-delay:.05s}.panel.on .kpi:nth-child(2){animation-delay:.1s}.panel.on .kpi:nth-child(3){animation-delay:.15s}.panel.on .kpi:nth-child(4){animation-delay:.2s}.panel.on .kpi:nth-child(5){animation-delay:.25s}
+    .foot{text-align:center;padding:0.9rem;font-size:0.58rem;color:var(--gris);border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+    .foot span{color:var(--or)}
+    .score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.5rem}
+    .score-box{background:var(--surface2);border:1px solid var(--border);padding:0.7rem;text-align:center}
+    .score-val{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:0.15rem}
+    .score-label{font-size:0.6rem;color:var(--gris);letter-spacing:0.08em;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+    .timeline{display:flex;flex-direction:column;gap:0.5rem}
+    .tl-item{display:flex;gap:0.8rem;padding:0.6rem;background:var(--surface2);border:1px solid var(--border)}
+    .tl-date{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--or);white-space:nowrap;min-width:60px}
+    .tl-content{font-size:0.74rem;color:var(--gris2);line-height:1.4}
+    .tl-title{color:var(--blanc);font-weight:600;font-size:0.76rem;margin-bottom:0.1rem}
+    @media(max-width:768px){.roles{grid-template-columns:1fr}.k4,.k5{grid-template-columns:repeat(2,1fr)}.g2,.g3,.g21,.g12{grid-template-columns:1fr}.score-grid{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="glow"></div>
+  <div class="login-logo">TERRI<span>TO</span>RIO</div>
+  <div class="login-sub">INTELLIGENCE TERRITORIALE · TEMPS RÉEL</div>
+  <div class="live-pill"><div class="dot"></div>GRAND NARBONNE · 37 COMMUNES · 136 925 HAB. (BANATIC 2024)</div>
+  <div class="login-heading">Sélectionnez votre profil d'accès</div>
+  <div class="roles">
+    <div class="rc r1" onclick="enter('maire')"><div class="rc-icon">🏛️</div><div class="rc-name">Président / Maire</div><div class="rc-desc">Vision stratégique. Risques politiques, opportunités, comparatif territorial, agenda décisionnel.</div><div class="rc-tags"><span class="rc-tag">VUE EXÉCUTIVE</span><span class="rc-tag">ALERTES POLITIQUES</span><span class="rc-tag">COMPARATIF TERRITORIAL</span></div></div>
+    <div class="rc r2" onclick="enter('dgs')"><div class="rc-icon">⚙️</div><div class="rc-name">DGS — Direction Générale</div><div class="rc-desc">Pilotage opérationnel complet. Tous indicateurs, tensions des services, synthèse multi-thématique.</div><div class="rc-tags"><span class="rc-tag">PILOTAGE GLOBAL</span><span class="rc-tag">TENSIONS SERVICES</span><span class="rc-tag">MULTI-INDICATEURS</span></div></div>
+    <div class="rc r3" onclick="enter('elu')"><div class="rc-icon">🗳️</div><div class="rc-name">Élu Délégué</div><div class="rc-desc">Périmètre délégué uniquement. Économie, emploi, urbanisme ou action sociale par commune.</div><div class="rc-tags"><span class="rc-tag">ÉCONOMIE</span><span class="rc-tag">EMPLOI</span><span class="rc-tag">ACTION SOCIALE</span></div></div>
+    <div class="rc r4" onclick="enter('directeur')"><div class="rc-icon">📊</div><div class="rc-name">Directeur de Service</div><div class="rc-desc">Données métier approfondies. Technique, social ou finances — granularité maximale, tableaux complets.</div><div class="rc-tags"><span class="rc-tag">DONNÉES MÉTIER</span><span class="rc-tag">GRANULARITÉ FINE</span><span class="rc-tag">RAPPORTS</span></div></div>
+  </div>
+  <div class="login-note">Prototype Couche 1 · Données 100% publiques (INSEE · SIRENE · DVF · France Travail · BANATIC)<br>L'accès aux données internes permettra une précision 10× supérieure</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="tl">
+      <div class="logo">TERRI<span>TO</span>RIO</div>
+      <div class="tpill"><div class="dot"></div>GRAND NARBONNE</div>
+      <div class="rpill" id="rpill"></div>
+    </div>
+    <div class="tr2">
+      <span class="clk" id="clk">--:--:--</span>
+      <a href="index.html" class="bbtn">← Site web</a>
+      <button class="lbtn" onclick="logout()">Changer de profil</button>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="iabar">
+    <div class="ialabel">⬡ IA</div>
+    <div class="iawrap">
+      <input class="iainput" id="iain" type="text" placeholder="Posez votre question sur le territoire...">
+      <button class="iabtn" onclick="runIA()">ANALYSER</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div class="iaresp" id="iaresp"></div>
+  <div class="main" id="main"></div>
+  <div class="foot">TERRITORIO · Prototype Couche 1 · INSEE · SIRENE · DVF · BANATIC · France Travail · <span>territoriograndnarbonne.netlify.app</span></div>
+</div>
+
+<script>
+// ============================================================
+// CONTENU HTML PAR PROFIL ET PAR ONGLET
+// ============================================================
+
+const CONTENT = {
+
+// ===================== MAIRE =====================
+maire: [
+
+// Onglet 0 — Vue exécutive
+`<div class="abanner ro">⚠️ <strong>Alerte exécutive :</strong> Chômage 18-24 ans à 26% sur les QPV de Narbonne — risque politique à traiter avant l'été 2025</div>
+<div class="krow k4">
+  <div class="kpi or"><div class="kl">Croissance démographique</div><div class="kv">+0,7%</div><div class="kd"><span class="up">↑ Aude : +0,4%</span></div></div>
+  <div class="kpi ro"><div class="kl">Chômage zone d'emploi</div><div class="kv">11,0%</div><div class="kd"><span class="dn">France : 7,2%</span></div></div>
+  <div class="kpi cy"><div class="kl">Créations entreprises/an</div><div class="kv">759</div><div class="kd"><span class="up">↑ +14% vs 2019</span></div></div>
+  <div class="kpi ve"><div class="kl">Emplois Port 2030</div><div class="kv">200+</div><div class="kd"><span class="up">Opportunité nationale</span></div></div>
+</div>
+<div class="g21">
+  <div class="card">
+    <div class="ct">Positionnement stratégique <span class="b bor">ANALYSE</span></div>
+    <div class="g2" style="margin:0;gap:0.55rem;background:none">
+      <div>
+        <div style="font-size:0.68rem;color:var(--vert);font-weight:600;margin-bottom:0.5rem">FORCES</div>
+        <div class="prog"><div class="ph"><span class="pl">Attractivité résidentielle</span><span class="pv" style="color:var(--vert)">Forte</span></div><div class="pt"><div class="pf" style="width:82%;background:var(--vert)"></div></div></div>
+        <div class="prog"><div class="ph"><span class="pl">Potentiel Port 2030</span><span class="pv" style="color:var(--vert)">Unique</span></div><div class="pt"><div class="pf" style="width:90%;background:var(--vert)"></div></div></div>
+        <div class="prog"><div class="ph"><span class="pl">Tourisme / Littoral</span><span class="pv" style="color:var(--vert)">Fort</span></div><div class="pt"><div class="pf" style="width:74%;background:var(--vert)"></div></div></div>
+        <div class="prog"><div class="ph"><span class="pl">Dynamique entrepreneuriale</span><span class="pv" style="color:var(--or)">Bonne</span></div><div class="pt"><div class="pf" style="width:62%;background:var(--or)"></div></div></div>
+      </div>
+      <div>
+        <div style="font-size:0.68rem;color:var(--rouge);font-weight:600;margin-bottom:0.5rem">DÉFIS</div>
+        <div class="prog"><div class="ph"><span class="pl">Chômage jeunes QPV</span><span class="pv" style="color:var(--rouge)">Critique</span></div><div class="pt"><div class="pf" style="width:86%;background:var(--rouge)"></div></div></div>
+        <div class="prog"><div class="ph"><span class="pl">Accès au logement</span><span class="pv" style="color:var(--rouge)">Tendu</span></div><div class="pt"><div class="pf" style="width:71%;background:var(--rouge)"></div></div></div>
+        <div class="prog"><div class="ph"><span class="pl">Commerce centre-ville</span><span class="pv" style="color:var(--or)">Modéré</span></div><div class="pt"><div class="pf" style="width:53%;background:var(--or)"></div></div></div>
+        <div class="prog"><div class="ph"><span class="pl">Dépendance saisonnière</span><span class="pv" style="color:var(--or)">Modéré</span></div><div class="pt"><div class="pf" style="width:58%;background:var(--or)"></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Agenda prioritaire <span class="b bro">URGENT</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">Plan emploi jeunes — URGENT</div><div class="stext">26% chômage 18-24 ans. Dispositif visible avant l'été requis.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Port 2030 — Communication nationale</div><div class="stext">200+ emplois à venir. Vitrine transition énergétique.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">Logement abordable</div><div class="stext">9,8% logements vacants mobilisables. Levier sans neuf.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">Centre-ville — Manager dédié</div><div class="stext">Vacance commerciale en hausse. Réponse visible et rapide.</div></div></div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card"><div class="ct">Population <span class="b bor">INSEE/BANATIC 2024</span></div><div style="font-family:'Syne',sans-serif;font-size:2.3rem;font-weight:800;color:var(--or);margin-bottom:0.2rem">136 925</div><div style="font-size:0.72rem;color:var(--gris2);margin-bottom:0.7rem">habitants officiels · 37 communes · 846,6 km²</div><canvas id="c_m1" style="max-height:110px"></canvas></div>
+  <div class="card"><div class="ct">Dynamique économique <span class="b bcy">SIRENE</span></div><div style="font-family:'Syne',sans-serif;font-size:2.3rem;font-weight:800;color:var(--cyan);margin-bottom:0.2rem">759</div><div style="font-size:0.72rem;color:var(--gris2);margin-bottom:0.7rem">créations entreprises/an · 5 569 actives</div><canvas id="c_m2" style="max-height:110px"></canvas></div>
+  <div class="card"><div class="ct">Comparatif chômage territorial <span class="b bve">ANALYSE</span></div><canvas id="c_m3" style="max-height:155px"></canvas></div>
+</div>`,
+
+// Onglet 1 — Risques & Alertes
+`<div class="abanner ro">⚠️ <strong>3 risques politiques actifs</strong> — Chômage jeunes, logement, commerce. Niveau d'attention : ÉLEVÉ</div>
+<div class="krow k4">
+  <div class="kpi ro"><div class="kl">Chômage 18-24 ans</div><div class="kv">26%</div><div class="kd"><span class="dn">QPV Narbonne · Critique</span></div></div>
+  <div class="kpi ro"><div class="kl">Hausse prix immo 2 ans</div><div class="kv">+12%</div><div class="kd"><span class="dn">Exclusion primo-accédants</span></div></div>
+  <div class="kpi or"><div class="kl">Vacance commerciale</div><div class="kv">↑</div><div class="kd"><span class="dn">Centre-ville Narbonne</span></div></div>
+  <div class="kpi ve"><div class="kl">Solde migratoire</div><div class="kv">+0,9%</div><div class="kd"><span class="up">Signal positif stable</span></div></div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div class="ct">Risques politiques — Matrice d'impact <span class="b bro">ANALYSE</span></div>
+    <canvas id="c_m4"></canvas>
+  </div>
+  <div class="card">
+    <div class="ct">Détail des risques identifiés <span class="b bro">ALERTES POLITIQUES</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">CRITIQUE — Chômage jeunes 18-24 ans (26%)</div><div class="stext">Concentration sur les QPV de Narbonne. Risque de fracture sociale visible et médiatisable avant les prochaines élections. Action : plan d'urgence insertion + formation anticipatoire Port 2030.</div></div></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">ÉLEVÉ — Exclusion du marché immobilier</div><div class="stext">+12% en 2 ans. Un actif local (salaire médian 1 850€/mois) ne peut plus accéder à la propriété à Narbonne sans apport conséquent. Sujet de prédilection pour l'opposition.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">MODÉRÉ — Désertification centre-ville</div><div class="stext">Vacance commerciale en hausse. Perception négative du dynamisme de Narbonne. Réponse rapide : manager de centre-ville + événements récurrents.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">MODÉRÉ — Dépendance au tourisme saisonnier</div><div class="stext">33% des créations d'entreprises dans le commerce/tourisme. Vulnérabilité aux chocs climatiques et économiques. Diversification à enclencher.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">SURVEILLANCE — Vieillissement accéléré</div><div class="stext">Solde naturel -0,2%/an. Pression croissante sur services de santé et médico-social à anticiper avant 2030.</div></div></div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card">
+    <div class="ct">Calendrier politique <span class="b bor">AGENDA</span></div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-date">T1 2025</div><div class="tl-content"><div class="tl-title">Annonce plan emploi jeunes</div><div>Dispositif visible avant l'été. Partenariat Mission Locale + France Travail.</div></div></div>
+      <div class="tl-item"><div class="tl-date">T2 2025</div><div class="tl-content"><div class="tl-title">Lancement manager centre-ville</div><div>Réponse à la vacance commerciale. Impact visible rapidement.</div></div></div>
+      <div class="tl-item"><div class="tl-date">T3 2025</div><div class="tl-content"><div class="tl-title">Communication Port 2030</div><div>Événement de lancement hub éolien. Vitrine nationale.</div></div></div>
+      <div class="tl-item"><div class="tl-date">T4 2025</div><div class="tl-content"><div class="tl-title">Bilan programme logement vacant</div><div>Résultats du programme de remobilisation des 1 200 logements vacants identifiés.</div></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Opportunités de communication <span class="b bve">CAPITAL POLITIQUE</span></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Port 2030 — Positionnement national</div><div class="stext">Seul territoire audois avec un hub éolien offshore. Visibilité nationale et internationale possible. Invitation médias spécialisés transition énergétique.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Attractivité résidentielle — Communication positive</div><div class="stext">+0,7%/an de croissance démographique, au-dessus de la moyenne régionale. Signal de confiance à valoriser.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">Logements vacants — Action concrète</div><div class="stext">9,8% de logements vacants = ~1 200 logements. Programme de remobilisation = action visible, pas chère, efficace à communiquer.</div></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Benchmark — Bonnes pratiques <span class="b bcy">AUTRES TERRITOIRES</span></div>
+    <table class="tbl"><thead><tr><th>Territoire</th><th>Action</th><th>Résultat</th></tr></thead><tbody>
+      <tr><td class="val">Montpellier Méd.</td><td>Garantie 1er emploi jeunes</td><td class="up">-4pts chômage jeunes</td></tr>
+      <tr><td class="val">Sète Agglopôle</td><td>Manager centre-ville</td><td class="up">-18% vacance / 2 ans</td></tr>
+      <tr><td class="val">Béziers CA</td><td>Prog. logements vacants</td><td class="up">850 remis sur marché</td></tr>
+      <tr><td class="val">Nîmes Métrople</td><td>Hub numérique</td><td class="up">+200 emplois tech</td></tr>
+    </tbody></table>
+  </div>
+</div>`,
+
+// Onglet 2 — Comparatif territorial
+`<div class="abanner or">📊 <strong>Comparatif basé sur données publiques</strong> — INSEE · BIT · SIRENE · BANATIC 2022-2024</div>
+<div class="krow k4">
+  <div class="kpi or"><div class="kl">Population Grand Narbonne</div><div class="kv">136 925</div><div class="kd"><span class="up">Rang 3 / Aude</span></div></div>
+  <div class="kpi cy"><div class="kl">Rang croissance démo.</div><div class="kv">#1</div><div class="kd"><span class="up">Agglos audoises</span></div></div>
+  <div class="kpi ro"><div class="kl">Écart chômage vs France</div><div class="kv">+3,8 pts</div><div class="kd"><span class="dn">Retard à combler</span></div></div>
+  <div class="kpi ve"><div class="kl">Atout unique</div><div class="kv">Port 2030</div><div class="kd"><span class="up">Hub énergétique</span></div></div>
+</div>
+<div class="g21">
+  <div class="card">
+    <div class="ct">Comparatif population — Agglos du Languedoc <span class="b bor">BANATIC 2024</span></div>
+    <canvas id="c_m5"></canvas>
+  </div>
+  <div class="card">
+    <div class="ct">Positionnement Grand Narbonne <span class="b bve">ANALYSE</span></div>
+    <div class="score-grid">
+      <div class="score-box"><div class="score-val" style="color:var(--vert)">A</div><div class="score-label">Démographie</div></div>
+      <div class="score-box"><div class="score-val" style="color:var(--or)">B+</div><div class="score-label">Économie</div></div>
+      <div class="score-box"><div class="score-val" style="color:var(--rouge)">C</div><div class="score-label">Emploi</div></div>
+      <div class="score-box"><div class="score-val" style="color:var(--vert)">A+</div><div class="score-label">Énergie</div></div>
+      <div class="score-box"><div class="score-val" style="color:var(--or)">B</div><div class="score-label">Immobilier</div></div>
+      <div class="score-box"><div class="score-val" style="color:var(--vert)">A</div><div class="score-label">Tourisme</div></div>
+    </div>
+  </div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div class="ct">Comparatif chômage — Agglos Occitanie <span class="b bro">INSEE BIT</span></div>
+    <canvas id="c_m6"></canvas>
+  </div>
+  <div class="card">
+    <div class="ct">Analyse différenciation concurrentielle <span class="b bcy">STRATÉGIE</span></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">UNIQUE — Hub éolien offshore Port 2030</div><div class="stext">Aucune autre agglo audoise ne dispose d'un projet énergie offshore de cette ampleur. Différenciation nationale absolue.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">FORT — Attractivité résidentielle littorale</div><div class="stext">Gruissan, Narbonne-Plage : +15-18% sur 2 ans. Demande soutenue de télétravailleurs depuis Montpellier et Toulouse.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">MOYEN — Tissu entrepreneurial</div><div class="stext">759 créations/an, mais taux de survie à 3 ans légèrement sous la moyenne nationale (58% vs 61%). Marge de progression.</div></div></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">RETARD — Marché de l'emploi</div><div class="stext">11% vs 8,5% pour Carcassonne Agglo, 9,2% Béziers. Le territoire attire des résidents mais ne crée pas suffisamment d'emplois qualifiés locaux.</div></div></div>
+  </div>
+</div>`
+],
+
+// ===================== DGS =====================
+dgs: [
+
+// Onglet 0 — Pilotage global
+`<div class="krow k5">
+  <div class="kpi or"><div class="kl">Population (BANATIC 2024)</div><div class="kv">136 925</div><div class="kd"><span class="up">↑ +0,7%/an</span></div></div>
+  <div class="kpi ro"><div class="kl">Taux chômage</div><div class="kv">11,0%</div><div class="kd"><span class="dn">France : 7,2%</span></div></div>
+  <div class="kpi cy"><div class="kl">Entreprises actives</div><div class="kv">5 569</div><div class="kd"><span class="up">+759/an</span></div></div>
+  <div class="kpi ve"><div class="kl">Prix immo moyen</div><div class="kv">~2 250€</div><div class="kd"><span class="dn">↑ +10%/2 ans</span></div></div>
+  <div class="kpi vi"><div class="kl">Chômage 18-24 ans</div><div class="kv">26%</div><div class="kd"><span class="dn">Signal critique</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Radar multi-indicateurs — Grand Narbonne vs Aude <span class="b bcy">PILOTAGE</span></div><canvas id="c_d1"></canvas></div>
+  <div class="card">
+    <div class="ct">Tensions opérationnelles <span class="b bro">ALERTES DGS</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">Logement — Pression HLM</div><div class="stext">+10% prix en 2 ans. 9,8% vacants à mobiliser.</div></div></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">QPV — Fracture jeunes</div><div class="stext">26% chômage 18-24. Coordination Mission Locale urgente.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">Équipements — Anticiper 2030</div><div class="stext">+0,7%/an. Pression crèches, voirie, réseaux.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Port 2030 — Coordination multi-services</div><div class="stext">200+ emplois attendus. Urbanisme + technique à préparer.</div></div></div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card"><div class="ct">Évolution démographique <span class="b bor">INSEE RP</span></div><canvas id="c_d2"></canvas></div>
+  <div class="card"><div class="ct">Répartition sectorielle entreprises <span class="b bcy">SIRENE</span></div><canvas id="c_d3"></canvas></div>
+  <div class="card">
+    <div class="ct">Tableau de bord synthèse <span class="b bve">KPI</span></div>
+    <table class="tbl"><thead><tr><th>Indicateur</th><th>Valeur</th><th>Tendance</th></tr></thead><tbody>
+      <tr><td class="val">Population</td><td>136 925</td><td class="up">↑ +0,7%/an</td></tr>
+      <tr><td class="val">Ménages</td><td>~61 200</td><td class="up">↑ +1,1%/an</td></tr>
+      <tr><td class="val">Chômage</td><td>11,0%</td><td class="up">↓ -0,5pt/an</td></tr>
+      <tr><td class="val">Créations ent.</td><td>759/an</td><td class="up">↑ +14%</td></tr>
+      <tr><td class="val">Prix immo</td><td>~2 250€/m²</td><td class="dn">↑ +10%</td></tr>
+      <tr><td class="val">Log. vacants</td><td>9,8%</td><td>→ Stable</td></tr>
+      <tr><td class="val">Chômage jeunes</td><td>26%</td><td class="dn">Signal fort</td></tr>
+    </tbody></table>
+  </div>
+</div>`,
+
+// Onglet 1 — Économie & Emploi
+`<div class="krow k4">
+  <div class="kpi or"><div class="kl">Créations entreprises/an</div><div class="kv">759</div><div class="kd"><span class="up">↑ +14% vs 2019</span></div></div>
+  <div class="kpi ro"><div class="kl">Chômage zone d'emploi</div><div class="kv">11,0%</div><div class="kd"><span class="dn">France : 7,2%</span></div></div>
+  <div class="kpi cy"><div class="kl">Taux de survie 3 ans</div><div class="kv">58%</div><div class="kd"><span>France : 61%</span></div></div>
+  <div class="kpi ve"><div class="kl">Offres d'emploi/mois</div><div class="kv">~420</div><div class="kd"><span class="up">France Travail</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Chômage historique — Grand Narbonne vs France <span class="b bro">INSEE BIT</span></div><canvas id="c_d4"></canvas></div>
+  <div class="card">
+    <div class="ct">Analyse emploi — Signaux clés <span class="b bcy">SYNTHÈSE</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">Écart chômage persistant</div><div class="stext">3,8 pts au-dessus de la moyenne nationale depuis 10 ans. Structurel, pas conjoncturel.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">Saisonnalité — Piège structurel</div><div class="stext">+35% de demandeurs d'emploi cat. A en octobre chaque année. Dépendance tourisme estival.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Port 2030 — Levier emploi qualifié</div><div class="stext">200+ emplois attendus en énergie offshore. Former maintenant pour capter ces postes localement.</div></div></div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card"><div class="ct">Créations entreprises — Évolution <span class="b bor">SIRENE</span></div><canvas id="c_d5"></canvas></div>
+  <div class="card">
+    <div class="ct">Secteurs qui recrutent <span class="b bcy">France Travail</span></div>
+    <table class="tbl"><thead><tr><th>Secteur</th><th>Offres/mois</th><th>Tension</th></tr></thead><tbody>
+      <tr><td class="val">Hôtellerie/Rest.</td><td>~120</td><td class="up">Forte</td></tr>
+      <tr><td class="val">BTP/Construction</td><td>~85</td><td class="up">Forte</td></tr>
+      <tr><td class="val">Commerce</td><td>~72</td><td>Modérée</td></tr>
+      <tr><td class="val">Santé/Social</td><td>~65</td><td class="up">Forte</td></tr>
+      <tr><td class="val">Transport</td><td>~48</td><td>Modérée</td></tr>
+      <tr><td class="val">Numérique</td><td>~18</td><td class="dn">Faible</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card"><div class="ct">Chômage par tranche d'âge <span class="b bro">INSEE BIT</span></div><canvas id="c_d6"></canvas></div>
+</div>`,
+
+// Onglet 2 — Démographie & Social
+`<div class="krow k4">
+  <div class="kpi or"><div class="kl">Population totale</div><div class="kv">136 925</div><div class="kd"><span class="up">↑ +0,7%/an</span></div></div>
+  <div class="kpi ve"><div class="kl">Solde migratoire</div><div class="kv">+0,9%</div><div class="kd"><span class="up">Attractivité forte</span></div></div>
+  <div class="kpi ro"><div class="kl">Solde naturel</div><div class="kv">-0,2%</div><div class="kd"><span class="dn">Vieillissement</span></div></div>
+  <div class="kpi cy"><div class="kl">Ménages</div><div class="kv">~61 200</div><div class="kd"><span class="up">↑ +1,1%/an</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Évolution démographique et projections <span class="b bor">INSEE RP</span></div><canvas id="c_d7"></canvas></div>
+  <div class="card">
+    <div class="ct">Structure des ménages <span class="b bcy">INSEE</span></div>
+    <div class="sg">
+      <div class="sb"><div class="sbl">Taille moy. ménage</div><div class="sbv">2,21</div><div class="sbs">personnes</div></div>
+      <div class="sb"><div class="sbl">Personnes seules</div><div class="sbv">34%</div><div class="sbs">des ménages</div></div>
+      <div class="sb"><div class="sbl">Familles monopar.</div><div class="sbv">11%</div><div class="sbs">des ménages</div></div>
+      <div class="sb"><div class="sbl">Résid. secondaires</div><div class="sbv">22%</div><div class="sbs">du parc</div></div>
+      <div class="sb"><div class="sbl">+65 ans</div><div class="sbv">32%</div><div class="sbs">en hausse</div></div>
+      <div class="sb"><div class="sbl">0-14 ans</div><div class="sbv">16,2%</div><div class="sbs">stable</div></div>
+    </div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card"><div class="ct">Pyramide des âges <span class="b bor">INSEE RP</span></div><canvas id="c_d8"></canvas></div>
+  <div class="card">
+    <div class="ct">Population par commune <span class="b bcy">INSEE RP 2022</span></div>
+    <table class="tbl"><thead><tr><th>Commune</th><th>Pop.</th><th>Tendance</th></tr></thead><tbody>
+      <tr><td class="val">Narbonne</td><td>57 765</td><td class="up">↑ +0,9%/an</td></tr>
+      <tr><td class="val">Port-la-Nouvelle</td><td>~6 100</td><td class="up">↑ +1,2%/an</td></tr>
+      <tr><td class="val">Coursan</td><td>~5 800</td><td class="up">↑ +0,6%/an</td></tr>
+      <tr><td class="val">Gruissan</td><td>~5 200</td><td class="up">↑ +1,1%/an</td></tr>
+      <tr><td class="val">Fleury d'Aude</td><td>~4 100</td><td class="up">↑ +0,8%/an</td></tr>
+      <tr><td class="val">Moussan</td><td>~3 200</td><td class="up">↑ +0,5%/an</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card">
+    <div class="ct">Indicateurs sociaux <span class="b bro">INSEE · CAF estimé</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">Vieillissement accéléré</div><div class="stext">+1pt/an de proportion 65+. Pression services médico-sociaux à anticiper avant 2030.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">34% de ménages isolés</div><div class="stext">Un ménage sur trois est une personne seule. Lien direct avec les besoins en logement adapté et services de proximité.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">Pression résidences secondaires</div><div class="stext">22% du parc en résidences secondaires. Réduit l'offre locative pour les actifs locaux.</div></div></div>
+  </div>
+</div>`,
+
+// Onglet 3 — Immobilier & Foncier
+`<div class="krow k4">
+  <div class="kpi or"><div class="kl">Prix moyen maison</div><div class="kv">~2 100€</div><div class="kd"><span class="dn">↑ +8% / 2 ans</span></div></div>
+  <div class="kpi cy"><div class="kl">Prix moyen appart.</div><div class="kv">~2 400€</div><div class="kd"><span class="dn">↑ +12% / 2 ans</span></div></div>
+  <div class="kpi ve"><div class="kl">Transactions/an</div><div class="kv">~2 800</div><div class="kd"><span class="up">↑ +6% vs 2022</span></div></div>
+  <div class="kpi ro"><div class="kl">Logements vacants</div><div class="kv">9,8%</div><div class="kd"><span class="dn">~1 200 logements</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Évolution prix au m² — DVF 2019-2024 <span class="b bor">DVF OFFICIEL</span></div><canvas id="c_d9"></canvas></div>
+  <div class="card">
+    <div class="ct">Répartition du parc <span class="b bcy">INSEE</span></div>
+    <canvas id="c_d10" style="max-height:130px"></canvas>
+    <div class="sg" style="margin-top:0.7rem">
+      <div class="sb"><div class="sbl">Propriétaires</div><div class="sbv">56%</div></div>
+      <div class="sb"><div class="sbl">Locataires</div><div class="sbv">38%</div></div>
+    </div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card">
+    <div class="ct">Prix par zone <span class="b bor">DVF 2024</span></div>
+    <table class="tbl"><thead><tr><th>Zone</th><th>Maison</th><th>Appart.</th><th>Tendance</th></tr></thead><tbody>
+      <tr><td class="val">Narbonne Centre</td><td>1 950€</td><td>2 200€</td><td class="up">↑ +7%</td></tr>
+      <tr><td class="val">Narbonne Nord/ZA</td><td>1 750€</td><td>—</td><td class="up">↑ +5%</td></tr>
+      <tr><td class="val">Gruissan</td><td>2 800€</td><td>3 100€</td><td class="up">↑ +15%</td></tr>
+      <tr><td class="val">Narbonne-Plage</td><td>3 200€</td><td>3 500€</td><td class="up">↑ +18%</td></tr>
+      <tr><td class="val">Port-la-Nouvelle</td><td>1 900€</td><td>2 000€</td><td class="up">↑ +9%</td></tr>
+      <tr><td class="val">Communes rurales</td><td>1 400€</td><td>—</td><td>→ Stable</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card"><div class="ct">Prix par zone — graphique <span class="b bor">DVF 2024</span></div><canvas id="c_d11"></canvas></div>
+  <div class="card">
+    <div class="ct">Signaux fonciers <span class="b bro">ALERTES</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">Exclusion primo-accédants</div><div class="stext">Salaire médian local ~1 850€/mois. Acquisition impossible à Narbonne Centre sans apport conséquent.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">1 200 logements vacants mobilisables</div><div class="stext">9,8% de vacance = levier politique sans construction neuve. Programme de remobilisation recommandé.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">Littoral — Valeur refuge investisseurs</div><div class="stext">+15-18% en 2 ans sur Gruissan et Narbonne-Plage. Risque de mono-fonctionnalité touristique.</div></div></div>
+  </div>
+</div>`
+],
+
+// ===================== ÉLU =====================
+elu: [
+
+// Onglet 0 — Économie & Entreprises
+`<div class="krow k4">
+  <div class="kpi or"><div class="kl">Entreprises actives</div><div class="kv">5 569</div><div class="kd"><span class="up">+759 créations/an</span></div></div>
+  <div class="kpi cy"><div class="kl">Commerce/Tourisme</div><div class="kv">33%</div><div class="kd"><span>des créations SIRENE</span></div></div>
+  <div class="kpi ro"><div class="kl">Radiations annuelles</div><div class="kv">~412</div><div class="kd"><span class="dn">À surveiller</span></div></div>
+  <div class="kpi ve"><div class="kl">Solde net/an</div><div class="kv">+347</div><div class="kd"><span class="up">Dynamique positive</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Créations vs Radiations — Évolution <span class="b bor">SIRENE</span></div><canvas id="c_e1"></canvas></div>
+  <div class="card">
+    <div class="ct">Attractivité par zone <span class="b bve">ANALYSE</span></div>
+    <div class="prog"><div class="ph"><span class="pl">Port-la-Nouvelle (Port 2030)</span><span class="pv" style="color:var(--vert)">Très forte ↑</span></div><div class="pt"><div class="pf" style="width:88%;background:var(--vert)"></div></div></div>
+    <div class="prog"><div class="ph"><span class="pl">Narbonne Nord / ZA</span><span class="pv" style="color:var(--or)">Forte</span></div><div class="pt"><div class="pf" style="width:76%;background:var(--or)"></div></div></div>
+    <div class="prog"><div class="ph"><span class="pl">Narbonne Centre</span><span class="pv" style="color:var(--cyan)">Modérée</span></div><div class="pt"><div class="pf" style="width:51%;background:var(--cyan)"></div></div></div>
+    <div class="prog"><div class="ph"><span class="pl">Gruissan / Littoral</span><span class="pv" style="color:var(--gris2)">Saisonnière</span></div><div class="pt"><div class="pf" style="width:43%;background:var(--gris)"></div></div></div>
+    <div class="prog"><div class="ph"><span class="pl">Communes rurales</span><span class="pv" style="color:var(--rouge)">Faible</span></div><div class="pt"><div class="pf" style="width:19%;background:var(--rouge)"></div></div></div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card"><div class="ct">Répartition sectorielle <span class="b bor">SIRENE</span></div><canvas id="c_e2"></canvas></div>
+  <div class="card">
+    <div class="ct">Signaux économiques <span class="b bro">ALERTES</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">Vacance commerciale centre-ville</div><div class="stext">Hausse sur Narbonne Centre. Manager de centre-ville recommandé.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Port 2030 — Sous-traitance locale</div><div class="stext">200+ emplois. Accompagner les PME locales pour capter les marchés dès maintenant.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">Cluster numérique possible</div><div class="stext">156 créations/an activités spécialisées. Coworking + accompagnement = levier d'activation.</div></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Top secteurs — Créations 2023 <span class="b bcy">SIRENE</span></div>
+    <table class="tbl"><thead><tr><th>Secteur</th><th>Créations</th><th>%</th></tr></thead><tbody>
+      <tr><td class="val">Commerce/Tourisme</td><td>252</td><td class="up">33%</td></tr>
+      <tr><td class="val">Activités spécialisées</td><td>156</td><td class="up">21%</td></tr>
+      <tr><td class="val">Admin/Santé</td><td>92</td><td>12%</td></tr>
+      <tr><td class="val">Construction</td><td>80</td><td>11%</td></tr>
+      <tr><td class="val">Transport/Logistique</td><td>48</td><td>6%</td></tr>
+    </tbody></table>
+  </div>
+</div>`,
+
+// Onglet 1 — Emploi & Chômage
+`<div class="krow k4">
+  <div class="kpi ro"><div class="kl">Taux de chômage</div><div class="kv">11,0%</div><div class="kd"><span class="dn">France : 7,2%</span></div></div>
+  <div class="kpi or"><div class="kl">Chômage 18-24 ans</div><div class="kv">26%</div><div class="kd"><span class="dn">↑ Signal critique</span></div></div>
+  <div class="kpi cy"><div class="kl">Demandeurs d'emploi</div><div class="kv">~8 200</div><div class="kd"><span class="up">↓ -0,5%/an</span></div></div>
+  <div class="kpi ve"><div class="kl">Offres d'emploi/mois</div><div class="kv">~420</div><div class="kd"><span>France Travail</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Évolution chômage — Zone d'emploi Narbonne <span class="b bro">INSEE BIT</span></div><canvas id="c_e3"></canvas></div>
+  <div class="card"><div class="ct">Chômage par âge <span class="b bro">ANALYSE</span></div><canvas id="c_e4"></canvas></div>
+</div>
+<div class="g3">
+  <div class="card">
+    <div class="ct">Secteurs qui recrutent <span class="b bve">France Travail</span></div>
+    <table class="tbl"><thead><tr><th>Secteur</th><th>Offres/mois</th><th>Tension</th></tr></thead><tbody>
+      <tr><td class="val">Hôtellerie/Rest.</td><td>~120</td><td class="up">Forte</td></tr>
+      <tr><td class="val">BTP/Construction</td><td>~85</td><td class="up">Forte</td></tr>
+      <tr><td class="val">Commerce</td><td>~72</td><td>Modérée</td></tr>
+      <tr><td class="val">Santé/Social</td><td>~65</td><td class="up">Forte</td></tr>
+      <tr><td class="val">Transport</td><td>~48</td><td>Modérée</td></tr>
+      <tr><td class="val">Numérique</td><td>~18</td><td class="dn">Sous-développé</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card">
+    <div class="ct">Signaux emploi <span class="b bro">ALERTES</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">Fracture jeunesse QPV</div><div class="stext">26% des 18-24 ans au chômage. Concentration sur Quartiers Prioritaires. Corrélation décrochage scolaire.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">Saisonnalité — Piège structurel</div><div class="stext">+35% de demandeurs cat. A en octobre chaque année. Tourisme = 1er employeur mais emplois précaires.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Port 2030 — Formation anticipatoire</div><div class="stext">200+ emplois qualifiés à venir. Former maintenant pour que les jeunes locaux captent ces postes.</div></div></div>
+  </div>
+  <div class="card"><div class="ct">Évolution annuelle demandeurs d'emploi <span class="b bcy">France Travail</span></div><canvas id="c_e5"></canvas></div>
+</div>`,
+
+// Onglet 2 — Immobilier & Urbanisme
+`<div class="krow k4">
+  <div class="kpi or"><div class="kl">Prix moyen maison</div><div class="kv">~2 100€</div><div class="kd"><span class="dn">↑ +8%/2 ans</span></div></div>
+  <div class="kpi cy"><div class="kl">Prix moyen appart.</div><div class="kv">~2 400€</div><div class="kd"><span class="dn">↑ +12%/2 ans</span></div></div>
+  <div class="kpi ro"><div class="kl">Logements vacants</div><div class="kv">9,8%</div><div class="kd"><span class="dn">~1 200 logements</span></div></div>
+  <div class="kpi ve"><div class="kl">Transactions/an</div><div class="kv">~2 800</div><div class="kd"><span class="up">↑ +6% vs 2022</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Évolution prix au m² — DVF 2024 <span class="b bor">DVF OFFICIEL</span></div><canvas id="c_e6"></canvas></div>
+  <div class="card">
+    <div class="ct">Leviers urbanisme <span class="b bve">ACTION PUBLIQUE</span></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Programme logements vacants</div><div class="stext">9,8% de vacance = ~1 200 logements. Remobilisation moins coûteuse que la construction neuve et politiquement plus rapide.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">Zone d'activité Port-la-Nouvelle</div><div class="stext">Préparer l'accueil des entreprises liées à Port 2030. Foncier économique à sécuriser maintenant.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">Centre-ville — Requalification commerciale</div><div class="stext">Vacance commerciale en hausse. ORT (Opération de Revitalisation Territoriale) envisageable.</div></div></div>
+  </div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div class="ct">Prix par zone — Comparatif <span class="b bor">DVF 2024</span></div>
+    <canvas id="c_e7"></canvas>
+  </div>
+  <div class="card">
+    <div class="ct">Enjeux fonciers par secteur <span class="b bro">ANALYSE</span></div>
+    <table class="tbl"><thead><tr><th>Zone</th><th>Enjeu principal</th><th>Priorité</th></tr></thead><tbody>
+      <tr><td class="val">Narbonne Centre</td><td>Vacance commerciale</td><td class="dn">Haute</td></tr>
+      <tr><td class="val">Port-la-Nouvelle</td><td>Foncier économique Port 2030</td><td class="up">Stratégique</td></tr>
+      <tr><td class="val">Gruissan / Littoral</td><td>Régulation résidences secondaires</td><td class="dn">Haute</td></tr>
+      <tr><td class="val">Communes rurales</td><td>Logements vacants à rénover</td><td>Modérée</td></tr>
+      <tr><td class="val">Narbonne périphérie</td><td>Maîtrise étalement urbain</td><td>Modérée</td></tr>
+    </tbody></table>
+  </div>
+</div>`,
+
+// Onglet 3 — Action sociale
+`<div class="krow k4">
+  <div class="kpi ro"><div class="kl">Chômage 18-24 ans QPV</div><div class="kv">26%</div><div class="kd"><span class="dn">Signal critique</span></div></div>
+  <div class="kpi or"><div class="kl">Ménages isolés</div><div class="kv">34%</div><div class="kd"><span>1 ménage sur 3</span></div></div>
+  <div class="kpi cy"><div class="kl">Familles monoparentales</div><div class="kv">11%</div><div class="kd"><span>des ménages</span></div></div>
+  <div class="kpi ve"><div class="kl">Part +65 ans</div><div class="kv">~32%</div><div class="kd"><span class="dn">↑ +1pt/an</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Pyramide des âges — Enjeux sociaux <span class="b bor">INSEE RP</span></div><canvas id="c_e8"></canvas></div>
+  <div class="card">
+    <div class="ct">Priorités action sociale <span class="b bro">ANALYSE</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">URGENT — Insertion jeunes QPV</div><div class="stext">26% de chômage 18-24 ans. Corrélation avec décrochage scolaire et précarité familiale. Plan d'urgence requis.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">ÉLEVÉ — Vieillissement et isolement</div><div class="stext">34% de ménages seuls + +65 ans en hausse. Risque d'isolement social croissant. Services à domicile à renforcer.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">MODÉRÉ — Familles monoparentales</div><div class="stext">11% des ménages. Besoin en mode de garde, accompagnement scolaire, soutien aux démarches.</div></div></div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card">
+    <div class="ct">Cartographie sociale par zone <span class="b bro">ANALYSE</span></div>
+    <table class="tbl"><thead><tr><th>Zone</th><th>Profil dominant</th><th>Action prioritaire</th></tr></thead><tbody>
+      <tr><td class="val">QPV Narbonne</td><td>Jeunes précaires</td><td class="dn">Insertion / Formation</td></tr>
+      <tr><td class="val">Centre Narbonne</td><td>Personnes âgées isolées</td><td class="or">Services à domicile</td></tr>
+      <tr><td class="val">Communes rurales</td><td>Familles modestes</td><td>Maintien services pub.</td></tr>
+      <tr><td class="val">Littoral</td><td>Résidents secondaires</td><td>Services saisonniers</td></tr>
+      <tr><td class="val">Port-la-Nouvelle</td><td>Actifs + familles</td><td class="up">Accompagnement emploi</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card">
+    <div class="ct">Évolution démographique par groupe <span class="b bcy">INSEE RP</span></div>
+    <canvas id="c_e9"></canvas>
+  </div>
+  <div class="card">
+    <div class="ct">Indicateurs de fragilité <span class="b bro">SIGNAUX</span></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">Saisonnalité et précarité</div><div class="stext">35% de hausse des demandeurs d'emploi en octobre. Précarité saisonnière touche en priorité les moins qualifiés.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">Logement inadapté aux seniors</div><div class="stext">Parc ancien en zones rurales peu adapté au vieillissement. Besoin en adaptation des logements en hausse.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Nouveaux arrivants télétravailleurs</div><div class="stext">Arrivée de CSP+ avec pouvoir d'achat élevé. Tension sur services et équipements existants.</div></div></div>
+  </div>
+</div>`
+],
+
+// ===================== DIRECTEUR =====================
+directeur: [
+
+// Onglet 0 — Démographie détaillée
+`<div class="krow k4">
+  <div class="kpi vi"><div class="kl">Population (BANATIC officiel)</div><div class="kv">136 925</div><div class="kd"><span>MAJ 25/11/2024</span></div></div>
+  <div class="kpi or"><div class="kl">Densité</div><div class="kv">161,8</div><div class="kd"><span>hab/km² · 846,6 km²</span></div></div>
+  <div class="kpi cy"><div class="kl">Ménages</div><div class="kv">~61 200</div><div class="kd"><span class="up">↑ +1,1%/an</span></div></div>
+  <div class="kpi ve"><div class="kl">Solde migratoire</div><div class="kv">+0,9%</div><div class="kd"><span class="up">Attractivité forte</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Évolution démographique 1999-2024 <span class="b bvi">INSEE RP</span></div><canvas id="c_dr1"></canvas></div>
+  <div class="card">
+    <div class="ct">Structure ménages <span class="b bor">INSEE</span></div>
+    <div class="sg">
+      <div class="sb"><div class="sbl">Taille moy. ménage</div><div class="sbv">2,21</div></div>
+      <div class="sb"><div class="sbl">Personnes seules</div><div class="sbv">34%</div></div>
+      <div class="sb"><div class="sbl">Familles monopar.</div><div class="sbv">11%</div></div>
+      <div class="sb"><div class="sbl">+65 ans</div><div class="sbv">~32%</div></div>
+      <div class="sb"><div class="sbl">Résid. secondaires</div><div class="sbv">22%</div></div>
+      <div class="sb"><div class="sbl">Solde naturel</div><div class="sbv">-0,2%</div></div>
+    </div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card"><div class="ct">Pyramide des âges <span class="b bcy">INSEE RP</span></div><canvas id="c_dr2"></canvas></div>
+  <div class="card">
+    <div class="ct">Population communes — Top 10 <span class="b bvi">INSEE RP 2022</span></div>
+    <table class="tbl"><thead><tr><th>Commune</th><th>Pop.</th><th>Évolution</th></tr></thead><tbody>
+      <tr><td class="val">Narbonne</td><td>57 765</td><td class="up">↑ +0,9%/an</td></tr>
+      <tr><td class="val">Port-la-Nouvelle</td><td>~6 100</td><td class="up">↑ +1,2%/an</td></tr>
+      <tr><td class="val">Coursan</td><td>~5 800</td><td class="up">↑ +0,6%/an</td></tr>
+      <tr><td class="val">Gruissan</td><td>~5 200</td><td class="up">↑ +1,1%/an</td></tr>
+      <tr><td class="val">Fleury d'Aude</td><td>~4 100</td><td class="up">↑ +0,8%/an</td></tr>
+      <tr><td class="val">Moussan</td><td>~3 200</td><td class="up">↑ +0,5%/an</td></tr>
+      <tr><td class="val">Vinassan</td><td>~2 800</td><td class="up">↑ +0,4%/an</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card"><div class="ct">Soldes démographiques comparés <span class="b bor">INSEE</span></div><canvas id="c_dr3"></canvas></div>
+</div>`,
+
+// Onglet 1 — Immobilier & DVF
+`<div class="krow k4">
+  <div class="kpi vi"><div class="kl">Transactions/an</div><div class="kv">~2 800</div><div class="kd"><span class="up">↑ +6% vs 2022</span></div></div>
+  <div class="kpi or"><div class="kl">Prix maison moyen</div><div class="kv">~2 100€</div><div class="kd"><span class="dn">↑ +8%/2 ans</span></div></div>
+  <div class="kpi cy"><div class="kl">Prix appart. moyen</div><div class="kv">~2 400€</div><div class="kd"><span class="dn">↑ +12%/2 ans</span></div></div>
+  <div class="kpi ro"><div class="kl">Logements vacants</div><div class="kv">9,8%</div><div class="kd"><span class="dn">~1 200 logements</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Prix au m² par zone — DVF 2024 <span class="b bvi">DVF OFFICIEL</span></div><canvas id="c_dr4"></canvas></div>
+  <div class="card">
+    <div class="ct">Parc logement <span class="b bor">INSEE</span></div>
+    <canvas id="c_dr5" style="max-height:130px"></canvas>
+    <div class="sg" style="margin-top:0.7rem">
+      <div class="sb"><div class="sbl">Propriétaires</div><div class="sbv">56%</div></div>
+      <div class="sb"><div class="sbl">Locataires</div><div class="sbv">38%</div></div>
+      <div class="sb"><div class="sbl">Résid. secondaires</div><div class="sbv">22%</div></div>
+      <div class="sb"><div class="sbl">Logements vacants</div><div class="sbv">9,8%</div></div>
+    </div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card">
+    <div class="ct">Tableau prix détaillé par zone <span class="b bor">DVF 2024</span></div>
+    <table class="tbl"><thead><tr><th>Zone</th><th>Maison</th><th>Appart.</th><th>Var. 2 ans</th></tr></thead><tbody>
+      <tr><td class="val">Narbonne Centre</td><td>1 950€</td><td>2 200€</td><td class="up">+7%</td></tr>
+      <tr><td class="val">Narbonne Nord</td><td>1 750€</td><td>—</td><td class="up">+5%</td></tr>
+      <tr><td class="val">Gruissan</td><td>2 800€</td><td>3 100€</td><td class="up">+15%</td></tr>
+      <tr><td class="val">Narbonne-Plage</td><td>3 200€</td><td>3 500€</td><td class="up">+18%</td></tr>
+      <tr><td class="val">Port-la-Nouvelle</td><td>1 900€</td><td>2 000€</td><td class="up">+9%</td></tr>
+      <tr><td class="val">Communes rurales</td><td>1 400€</td><td>—</td><td>Stable</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card"><div class="ct">Évolution prix 2019-2024 <span class="b bor">DVF</span></div><canvas id="c_dr6"></canvas></div>
+  <div class="card">
+    <div class="ct">Analyse foncière <span class="b bro">SIGNAUX</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">Exclusion primo-accédants locaux</div><div class="stext">Salaire médian ~1 850€/mois. Acquisition à Narbonne Centre impossible sans apport &gt;20%.</div></div></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Potentiel vacance mobilisable</div><div class="stext">~1 200 logements vacants identifiables. Programme de remobilisation = levier concret.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">Pression résidences secondaires (22%)</div><div class="stext">Littoral saturé. Réduit l'offre locative permanente pour les actifs locaux.</div></div></div>
+  </div>
+</div>`,
+
+// Onglet 2 — Emploi & Social
+`<div class="krow k4">
+  <div class="kpi vi"><div class="kl">Demandeurs d'emploi</div><div class="kv">~8 200</div><div class="kd"><span class="up">↓ -0,5%/an</span></div></div>
+  <div class="kpi ro"><div class="kl">Taux de chômage</div><div class="kv">11,0%</div><div class="kd"><span class="dn">France : 7,2%</span></div></div>
+  <div class="kpi or"><div class="kl">Chômage 18-24 ans</div><div class="kv">26%</div><div class="kd"><span class="dn">Critique</span></div></div>
+  <div class="kpi cy"><div class="kl">Offres/mois</div><div class="kv">~420</div><div class="kd"><span>France Travail</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Chômage historique 2008-2024 <span class="b bro">INSEE BIT</span></div><canvas id="c_dr7"></canvas></div>
+  <div class="card"><div class="ct">Chômage par tranche d'âge <span class="b bro">INSEE BIT</span></div><canvas id="c_dr8"></canvas></div>
+</div>
+<div class="g3">
+  <div class="card">
+    <div class="ct">Indicateurs sociaux fins <span class="b bvi">INSEE · estimations</span></div>
+    <div class="sg">
+      <div class="sb"><div class="sbl">Ménages isolés</div><div class="sbv">34%</div><div class="sbs">des ménages</div></div>
+      <div class="sb"><div class="sbl">Familles monopar.</div><div class="sbv">11%</div><div class="sbs">des ménages</div></div>
+      <div class="sb"><div class="sbl">+65 ans</div><div class="sbv">~32%</div><div class="sbs">en hausse</div></div>
+      <div class="sb"><div class="sbl">Taux pauvreté Aude</div><div class="sbv">20%</div><div class="sbs">vs France 14%</div></div>
+      <div class="sb"><div class="sbl">Part emploi saisonnier</div><div class="sbv">~35%</div><div class="sbs">secteur touristique</div></div>
+      <div class="sb"><div class="sbl">Niveau qualification</div><div class="sbv">Moyen</div><div class="sbs">Sous moy. Occitanie</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Secteurs — Offres d'emploi <span class="b bcy">France Travail</span></div>
+    <canvas id="c_dr9"></canvas>
+  </div>
+  <div class="card">
+    <div class="ct">Signaux sociaux prioritaires <span class="b bro">ALERTES</span></div>
+    <div class="sig"><div class="sdot ro"></div><div class="sbody"><div class="stitle">Taux pauvreté Aude — 20%</div><div class="stext">Parmi les plus élevés de France. Supérieur de 6pts à la moyenne nationale. Corrélé au chômage structurel.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">Qualification insuffisante</div><div class="stext">Niveau de qualification inférieur à la moyenne Occitanie. Décalage avec les emplois créés dans les secteurs porteurs.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">Précarité saisonnière structurelle</div><div class="stext">35% environ des emplois touristiques. Cycles de chômage annuels prévisibles et massifs en fin de saison.</div></div></div>
+  </div>
+</div>`,
+
+// Onglet 3 — Données communes
+`<div class="abanner ve">📊 <strong>Données consolidées par commune</strong> — Sources : INSEE RP 2022 · BANATIC 2024 · DVF 2024 · SIRENE</div>
+<div class="krow k4">
+  <div class="kpi vi"><div class="kl">Communes membres</div><div class="kv">37</div><div class="kd"><span>846,6 km²</span></div></div>
+  <div class="kpi or"><div class="kl">Commune principale</div><div class="kv">57 765</div><div class="kd"><span>Narbonne — 42%</span></div></div>
+  <div class="kpi cy"><div class="kl">Croissance moy. communes</div><div class="kv">+0,7%</div><div class="kd"><span class="up">/an</span></div></div>
+  <div class="kpi ve"><div class="kl">Densité moy.</div><div class="kv">161,8</div><div class="kd"><span>hab/km²</span></div></div>
+</div>
+<div class="g21">
+  <div class="card"><div class="ct">Population par commune — Comparatif <span class="b bvi">INSEE RP 2022</span></div><canvas id="c_dr10"></canvas></div>
+  <div class="card">
+    <div class="ct">Profil des communes <span class="b bor">ANALYSE</span></div>
+    <table class="tbl"><thead><tr><th>Commune</th><th>Pop.</th><th>Prix immo</th><th>Profil</th></tr></thead><tbody>
+      <tr><td class="val">Narbonne</td><td>57 765</td><td>~2 000€</td><td>Urbain mixte</td></tr>
+      <tr><td class="val">Port-la-Nouvelle</td><td>~6 100</td><td>~1 950€</td><td>Industriel / Port</td></tr>
+      <tr><td class="val">Gruissan</td><td>~5 200</td><td>~2 950€</td><td>Touristique</td></tr>
+      <tr><td class="val">Coursan</td><td>~5 800</td><td>~1 700€</td><td>Résidentiel</td></tr>
+      <tr><td class="val">Fleury d'Aude</td><td>~4 100</td><td>~1 800€</td><td>Résidentiel</td></tr>
+      <tr><td class="val">Communes rurales</td><td>&lt;2 000</td><td>~1 400€</td><td>Rural agricole</td></tr>
+    </tbody></table>
+  </div>
+</div>
+<div class="g2">
+  <div class="card"><div class="ct">Répartition population — Poids relatif <span class="b bvi">INSEE</span></div><canvas id="c_dr11"></canvas></div>
+  <div class="card">
+    <div class="ct">Indicateurs croisés communes <span class="b bcy">SYNTHÈSE</span></div>
+    <div class="sig"><div class="sdot ve"></div><div class="sbody"><div class="stitle">Port-la-Nouvelle — Commune à fort potentiel</div><div class="stext">+1,2%/an de croissance démographique, la plus forte de l'agglo. Port 2030 va accélérer cette dynamique.</div></div></div>
+    <div class="sig"><div class="sdot or"></div><div class="sbody"><div class="stitle">Gruissan — Tension touristique</div><div class="stext">+1,1%/an et prix immobiliers +15% en 2 ans. Risque de déséquilibre résidents permanents/saisonniers.</div></div></div>
+    <div class="sig"><div class="sdot cy"></div><div class="sbody"><div class="stitle">Communes rurales — Vigilance services</div><div class="stext">Population stable ou en légère baisse. Maintien des services publics de proximité à défendre.</div></div></div>
+    <div class="sig"><div class="sdot vi"></div><div class="sbody"><div class="stitle">Narbonne — Poids dominant (42% de l'agglo)</div><div class="stext">La santé économique et sociale de Narbonne détermine celle de l'ensemble du territoire.</div></div></div>
+  </div>
+</div>`
+]
+};
+
+// ============================================================
+// CONFIGURATION RÔLES
+// ============================================================
+const ROLES = {
+  maire: {
+    name:"Président / Maire", col:"var(--or)",
+    chips:["Quels sont mes risques politiques à 6 mois ?","Comment nous comparons-nous aux voisins ?","Opportunités de communication Port 2030 ?"],
+    tabs:["Vue exécutive","Risques & Alertes","Comparatif territorial"],
+    ia:{
+      d:`<strong>Synthèse exécutive</strong><br><br>Territoire en croissance démographique soutenue (+0,7%/an). Deux signaux stratégiques : chômage des jeunes à 26% = <strong>risque politique immédiat</strong>, Port 2030 = <strong>opportunité de communication nationale</strong>.<br><br>Population confirmée : <strong>136 925 habitants</strong> (BANATIC, 25/11/2024).<br><em>→ Plan emploi jeunes visible avant l'été + capitalisation sur Port 2030.</em>`,
+      risque:`<strong>Risques politiques à 6 mois</strong><br><br><strong>Critique :</strong> 26% chômage 18-24 ans QPV. Action visible requise avant l'été.<br><strong>Élevé :</strong> +12% prix immo en 2 ans. Primo-accédants exclus. Sujet de prédilection pour l'opposition.<br><strong>Modéré :</strong> Vacance commerciale Narbonne Centre. Perception négative du dynamisme.`,
+      compa:`<strong>Comparatif territorial</strong><br><br>Atouts : croissance démo +0,7%/an (vs +0,4% Aude), attractivité littorale unique, Port 2030 différenciant.<br>Retards : Chômage 11% vs ~8,5% Carcassonne Agglo. Le territoire attire des résidents mais ne génère pas suffisamment d'emplois qualifiés.`
+    }
+  },
+  dgs: {
+    name:"DGS — Direction Générale", col:"var(--cyan)",
+    chips:["Synthèse opérationnelle ?","Quels services sont sous pression ?","Indicateurs à surveiller ce trimestre ?"],
+    tabs:["Pilotage global","Économie & Emploi","Démographie & Social","Immobilier & Foncier"],
+    ia:{
+      d:`<strong>Synthèse opérationnelle</strong><br><br>Trois tensions structurelles : chômage 11% (pression RSA + France Travail), marché immobilier tendu (+10%), fracture jeunesse QPV.<br><br>En positif : 759 créations/an, Port 2030, attractivité résidentielle forte.<br><em>→ Connecter les données internes CAF + services techniques = vision temps réel des 3 tensions.</em>`,
+      pression:`<strong>Services sous pression</strong><br><br><strong>Logement (forte) :</strong> +10% prix, 9,8% vacance.<br><strong>Insertion/emploi (critique) :</strong> 26% chômage jeunes QPV.<br><strong>Services techniques (modérée) :</strong> +0,7%/an = anticiper crèches, voirie, réseaux à 2030.`
+    }
+  },
+  elu: {
+    name:"Élu Délégué", col:"var(--vert)",
+    chips:["État du commerce de centre-ville ?","Zones à fort potentiel économique ?","Où concentrer les politiques emploi ?"],
+    tabs:["Économie & Entreprises","Emploi & Chômage","Immobilier & Urbanisme","Action sociale"],
+    ia:{
+      d:`<strong>Synthèse élu délégué</strong><br><br>759 créations d'entreprises/an. Potentiel numérique sous-exploité. Vacance commerciale en hausse sur Narbonne Centre.<br><em>→ Données de fréquentation + flux piétons permettraient d'affiner ce diagnostic.</em>`,
+      commerce:`<strong>Commerce de centre-ville</strong><br><br>Vacance en hausse. Facteurs : concurrence zone commerciale nord, e-commerce.<br>Actions : manager de centre-ville, chèque-commerce, événementialisation.`
+    }
+  },
+  directeur: {
+    name:"Directeur de Service", col:"var(--violet)",
+    chips:["Données démographiques détaillées ?","Évolution DVF par zone ?","Indicateurs sociaux fins ?"],
+    tabs:["Démographie détaillée","Immobilier & DVF","Emploi & Social","Données communes"],
+    ia:{
+      d:`<strong>Données détaillées — Grand Narbonne</strong><br><br>Population : <strong>136 925 hab.</strong> (BANATIC 25/11/2024). 37 communes, 846,6 km², densité 161,8 hab/km².<br><br>Immobilier DVF 2024 : maisons ~2 100€/m², appartements ~2 400€/m². Hausse 8-18% selon zones.<br><em>→ Données internes cadastre + permis construire = analyse foncière à la parcelle.</em>`
+    }
+  }
+};
+
+// ============================================================
+// LOGIQUE APP
+// ============================================================
+let role=null, CH={};
+const gc={f:{family:'DM Sans',size:10},g:'#1A2030',t:'#4A5870'};
+
+function mk(id,type,data,opts){const el=document.getElementById(id);if(!el)return;CH[id]=new Chart(el,{type,data,options:opts});}
+function killCharts(){Object.values(CH).forEach(c=>{try{c.destroy()}catch(e){}});CH={};}
+
+const baseOpts=(yFmt)=>({responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9},...(yFmt?{callback:yFmt}:{})},grid:{color:gc.g}}}});
+const baseLegOpts=()=>({responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}}}});
+const doughOpts=()=>({responsive:true,plugins:{legend:{position:'bottom',labels:{color:gc.t,font:{size:9},boxWidth:10,padding:6}}}});
+const hbarOpts=(xFmt)=>({responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{color:gc.t,font:{size:9},...(xFmt?{callback:xFmt}:{})},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9}},grid:{display:false}}}});
+const radarOpts=()=>({responsive:true,scales:{r:{ticks:{color:gc.t,backdropColor:'transparent',font:{size:8}},grid:{color:gc.g},pointLabels:{color:gc.t,font:{size:9}}}},plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}}});
+
+function buildCharts(r){
+  setTimeout(()=>{
+    killCharts();
+    const pop=[115000,122000,127000,131000,133500,136925];
+    const popL=['2006','2011','2015','2018','2021','2024'];
+
+    if(r==='maire'){
+      mk('c_m1','line',{labels:['2010','2014','2018','2021','2024'],datasets:[{data:[115000,122000,131000,133500,136925],borderColor:'#C9A84C',borderWidth:2,pointRadius:3,fill:true,backgroundColor:'rgba(201,168,76,0.06)',tension:0.4}]},{...baseOpts(v=>(v/1000).toFixed(0)+'k')});
+      mk('c_m2','bar',{labels:['2019','2020','2021','2022','2023'],datasets:[{data:[665,759,720,735,750],backgroundColor:'rgba(0,200,240,0.7)',borderColor:'#00C8F0',borderWidth:1}]},{...baseOpts()});
+      mk('c_m3','bar',{labels:['Grand Narbonne','Carcassonne Agglo','Béziers Méd.','Perpignan Méd.'],datasets:[{data:[11.0,8.5,9.2,12.1],backgroundColor:['#FF3D50','#C9A84C','#C9A84C','#C9A84C'],borderWidth:0}]},{...hbarOpts(v=>v+'%')});
+      mk('c_m4','bubble',{datasets:[
+        {label:'Chômage jeunes',data:[{x:9,y:8,r:18}],backgroundColor:'rgba(255,61,80,0.7)'},
+        {label:'Logement',data:[{x:7,y:7,r:14}],backgroundColor:'rgba(255,61,80,0.5)'},
+        {label:'Commerce',data:[{x:5,y:5,r:10}],backgroundColor:'rgba(201,168,76,0.6)'},
+        {label:'Saisonnalité',data:[{x:4,y:6,r:10}],backgroundColor:'rgba(201,168,76,0.5)'},
+        {label:'Vieillissement',data:[{x:3,y:4,r:8}],backgroundColor:'rgba(0,200,240,0.5)'},
+      ]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:{size:9},boxWidth:10}}},scales:{x:{title:{display:true,text:'Probabilité →',color:gc.t,font:{size:9}},ticks:{color:gc.t,font:{size:8}},grid:{color:gc.g}},y:{title:{display:true,text:'Impact ↑',color:gc.t,font:{size:9}},ticks:{color:gc.t,font:{size:8}},grid:{color:gc.g}}}});
+      mk('c_m5','bar',{labels:['Montpellier Méd.','Nîmes Métropole','Grand Narbonne','Perpignan Méd.','Carcassonne Agglo','Béziers CA'],datasets:[{data:[480000,250000,136925,190000,107000,125000],backgroundColor:['#4A5870','#4A5870','#C9A84C','#4A5870','#4A5870','#4A5870'],borderWidth:0}]},{...hbarOpts(v=>(v/1000).toFixed(0)+'k')});
+      mk('c_m6','bar',{labels:['Grand Narbonne','Carcassonne Agglo','Béziers CA','Perpignan Méd.','Montpellier Méd.','France'],datasets:[{data:[11.0,8.5,9.2,12.1,9.0,7.2],backgroundColor:['#FF3D50','#C9A84C','#C9A84C','#FF3D50','#C9A84C','#00E87A'],borderWidth:0}]},{...hbarOpts(v=>v+'%')});
+    }
+
+    if(r==='dgs'){
+      mk('c_d1','radar',{labels:['Démographie','Économie','Emploi','Immobilier','Social','Attractivité'],datasets:[{label:'Grand Narbonne',data:[75,62,40,55,38,78],borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.08)',borderWidth:2,pointBackgroundColor:'#C9A84C'},{label:'Moy. Aude',data:[55,50,48,45,50,52],borderColor:'#4A5870',backgroundColor:'rgba(74,88,112,0.04)',borderWidth:1,borderDash:[4,4]}]},{...radarOpts()});
+      mk('c_d2','line',{labels:popL,datasets:[{data:pop,borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.05)',borderWidth:2,pointRadius:3,fill:true,tension:0.3}]},{...baseOpts(v=>(v/1000).toFixed(0)+'k')});
+      mk('c_d3','doughnut',{labels:['Commerce/Tourisme','Activités spéc.','Admin/Santé','Construction','Autres'],datasets:[{data:[252,156,92,80,179],backgroundColor:['#C9A84C','#00C8F0','#00E87A','#5A7080','#1A2030'],borderColor:'#07090E',borderWidth:3}]},{...doughOpts()});
+      mk('c_d4','line',{labels:['2008','2010','2013','2015','2018','2020','2022','2024'],datasets:[{label:'Grand Narbonne',data:[11,13,14.5,15.7,13.5,12.1,11.8,11.0],borderColor:'#FF3D50',backgroundColor:'rgba(255,61,80,0.05)',borderWidth:2,fill:true,tension:0.4,pointRadius:3},{label:'France',data:[7.4,9.3,10.4,10.4,9.0,8.0,7.3,7.2],borderColor:'#4A5870',borderWidth:1.5,borderDash:[5,5],pointRadius:0,tension:0.4}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9},callback:v=>v+'%'},grid:{color:gc.g}}}});
+      mk('c_d5','bar',{labels:['2015','2017','2019','2020','2021','2022','2023'],datasets:[{label:'Créations',data:[520,580,665,759,720,735,750],backgroundColor:'rgba(201,168,76,0.7)',borderColor:'#C9A84C',borderWidth:1},{label:'Radiations',data:[320,355,390,412,385,395,405],backgroundColor:'rgba(255,61,80,0.3)',borderColor:'#FF3D50',borderWidth:1}]},{...baseLegOpts()});
+      mk('c_d6','bar',{labels:['18-24 ans','25-49 ans','50-64 ans'],datasets:[{data:[26,10.5,9.2],backgroundColor:['#FF3D50','#C9A84C','#00C8F0'],borderWidth:0}]},{...hbarOpts(v=>v+'%')});
+      mk('c_d7','line',{labels:['1999','2006','2011','2015','2018','2021','2024','2030 (proj.)'],datasets:[{label:'Réelle',data:[105000,115000,122000,127000,131000,133500,136925,null],borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.06)',borderWidth:2,pointRadius:3,fill:true,tension:0.3},{label:'Projection',data:[null,null,null,null,null,null,136925,142000],borderColor:'#00C8F0',borderWidth:1.5,borderDash:[5,5],pointRadius:0,tension:0.3}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9},callback:v=>(v/1000).toFixed(0)+'k'},grid:{color:gc.g}}}});
+      mk('c_d8','bar',{labels:['0-14','15-29','30-44','45-59','60-74','75+'],datasets:[{data:[16.2,14.8,17.1,19.3,18.6,14.0],backgroundColor:['#00E87A','#00C8F0','#C9A84C','#C9A84C','#FF3D50','#FF3D50'],borderWidth:0}]},{...hbarOpts(v=>v+'%')});
+      mk('c_d9','line',{labels:['2019','2020','2021','2022','2023','2024'],datasets:[{label:'Maisons',data:[1650,1750,1900,2000,2050,2100],borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.06)',borderWidth:2,pointRadius:3,fill:true,tension:0.3},{label:'Appartements',data:[1800,1950,2100,2250,2350,2400],borderColor:'#00C8F0',borderWidth:2,pointRadius:3,tension:0.3}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9},callback:v=>v+'€'},grid:{color:gc.g}}}});
+      mk('c_d10','doughnut',{labels:['Résid. principales','Résid. secondaires','Logements vacants'],datasets:[{data:[68,22,10],backgroundColor:['#C9A84C','#00C8F0','#FF3D50'],borderColor:'#07090E',borderWidth:3}]},{...doughOpts()});
+      mk('c_d11','bar',{labels:['Narbo. Centre','Narbo. Nord','Gruissan','Narbo. Plage','Port-la-N.','Rural'],datasets:[{label:'Maison',data:[1950,1750,2800,3200,1900,1400],backgroundColor:'rgba(201,168,76,0.75)',borderWidth:0},{label:'Appart.',data:[2200,0,3100,3500,2000,0],backgroundColor:'rgba(0,200,240,0.55)',borderWidth:0}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:8}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}}}});
+    }
+
+    if(r==='elu'){
+      mk('c_e1','bar',{labels:['2015','2017','2019','2020','2021','2022','2023'],datasets:[{label:'Créations',data:[520,580,665,759,720,735,750],backgroundColor:'rgba(0,232,122,0.6)',borderColor:'#00E87A',borderWidth:1},{label:'Radiations',data:[320,355,390,412,385,395,405],backgroundColor:'rgba(255,61,80,0.3)',borderColor:'#FF3D50',borderWidth:1}]},{...baseLegOpts()});
+      mk('c_e2','doughnut',{labels:['Commerce/Tourisme','Activités spéc.','Admin/Santé','Construction','Autres'],datasets:[{data:[252,156,92,80,179],backgroundColor:['#C9A84C','#00C8F0','#00E87A','#5A7080','#1A2030'],borderColor:'#07090E',borderWidth:3}]},{...doughOpts()});
+      mk('c_e3','line',{labels:['2010','2013','2015','2018','2020','2022','2024'],datasets:[{label:'Grand Narbonne',data:[13,14.5,15.7,13.5,12.1,11.8,11.0],borderColor:'#FF3D50',backgroundColor:'rgba(255,61,80,0.05)',borderWidth:2,fill:true,tension:0.4,pointRadius:3},{label:'France',data:[9.3,10.4,10.4,9.0,8.0,7.3,7.2],borderColor:'#4A5870',borderWidth:1.5,borderDash:[5,5],pointRadius:0,tension:0.4}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9},callback:v=>v+'%'},grid:{color:gc.g}}}});
+      mk('c_e4','bar',{labels:['18-24 ans','25-49 ans','50-64 ans'],datasets:[{data:[26,10.5,9.2],backgroundColor:['#FF3D50','#C9A84C','#00C8F0'],borderWidth:0}]},{...hbarOpts(v=>v+'%')});
+      mk('c_e5','line',{labels:['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'],datasets:[{label:'Demandeurs cat. A (annuel moyen)',data:[8200,8100,8000,7900,7800,7600,7200,6800,7200,8500,8600,8400],borderColor:'#00E87A',backgroundColor:'rgba(0,232,122,0.05)',borderWidth:2,fill:true,tension:0.4,pointRadius:2}]},{...baseOpts()});
+      mk('c_e6','line',{labels:['2019','2020','2021','2022','2023','2024'],datasets:[{label:'Maisons',data:[1650,1750,1900,2000,2050,2100],borderColor:'#00E87A',backgroundColor:'rgba(0,232,122,0.05)',borderWidth:2,fill:true,tension:0.3,pointRadius:3},{label:'Appartements',data:[1800,1950,2100,2250,2350,2400],borderColor:'#00C8F0',borderWidth:2,pointRadius:3,tension:0.3}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9},callback:v=>v+'€'},grid:{color:gc.g}}}});
+      mk('c_e7','bar',{labels:['Narbo. Centre','Narbo. Nord','Gruissan','Narbo. Plage','Port-la-N.','Rural'],datasets:[{label:'Maison',data:[1950,1750,2800,3200,1900,1400],backgroundColor:'rgba(0,232,122,0.6)',borderWidth:0},{label:'Appart.',data:[2200,0,3100,3500,2000,0],backgroundColor:'rgba(0,200,240,0.5)',borderWidth:0}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:8}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}}}});
+      mk('c_e8','bar',{labels:['0-14','15-29','30-44','45-59','60-74','75+'],datasets:[{data:[16.2,14.8,17.1,19.3,18.6,14.0],backgroundColor:['#00E87A','#00C8F0','#C9A84C','#C9A84C','#FF3D50','#FF3D50'],borderWidth:0}]},{...hbarOpts(v=>v+'%')});
+      mk('c_e9','line',{labels:['2010','2015','2018','2021','2024'],datasets:[{label:'0-14 ans',data:[17.5,17.0,16.5,16.3,16.2],borderColor:'#00E87A',borderWidth:2,tension:0.3,pointRadius:3},{label:'15-29 ans',data:[16.0,15.5,15.2,14.9,14.8],borderColor:'#00C8F0',borderWidth:2,tension:0.3,pointRadius:3},{label:'+65 ans',data:[27.0,29.0,30.5,31.5,32.0],borderColor:'#FF3D50',borderWidth:2,tension:0.3,pointRadius:3}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9},callback:v=>v+'%'},grid:{color:gc.g}}}});
+    }
+
+    if(r==='directeur'){
+      mk('c_dr1','line',{labels:['1999','2006','2011','2015','2018','2021','2024'],datasets:[{data:[105000,115000,122000,127000,131000,133500,136925],borderColor:'#A78BFA',backgroundColor:'rgba(167,139,250,0.06)',borderWidth:2,pointRadius:4,fill:true,tension:0.3}]},{...baseOpts(v=>(v/1000).toFixed(0)+'k')});
+      mk('c_dr2','bar',{labels:['0-14','15-29','30-44','45-59','60-74','75+'],datasets:[{data:[16.2,14.8,17.1,19.3,18.6,14.0],backgroundColor:['#00E87A','#00C8F0','#C9A84C','#C9A84C','#FF3D50','#FF3D50'],borderWidth:0}]},{...hbarOpts(v=>v+'%')});
+      mk('c_dr3','bar',{labels:['Solde migratoire','Solde naturel','Variation totale'],datasets:[{data:[0.9,-0.2,0.7],backgroundColor:['#00E87A','#FF3D50','#C9A84C'],borderWidth:0}]},{...baseOpts(v=>v+'%')});
+      mk('c_dr4','bar',{labels:['Narbo. Centre','Narbo. Nord','Gruissan','Narbo. Plage','Port-la-N.','Rural'],datasets:[{label:'Maison €/m²',data:[1950,1750,2800,3200,1900,1400],backgroundColor:'rgba(201,168,76,0.75)',borderWidth:0},{label:'Appart. €/m²',data:[2200,0,3100,3500,2000,0],backgroundColor:'rgba(0,200,240,0.55)',borderWidth:0}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:8}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}}}});
+      mk('c_dr5','doughnut',{labels:['Résid. principales','Résid. secondaires','Logements vacants'],datasets:[{data:[68,22,10],backgroundColor:['#C9A84C','#00C8F0','#FF3D50'],borderColor:'#07090E',borderWidth:3}]},{...doughOpts()});
+      mk('c_dr6','line',{labels:['2019','2020','2021','2022','2023','2024'],datasets:[{label:'Maisons',data:[1650,1750,1900,2000,2050,2100],borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.06)',borderWidth:2,fill:true,tension:0.3,pointRadius:3},{label:'Appartements',data:[1800,1950,2100,2250,2350,2400],borderColor:'#00C8F0',borderWidth:2,tension:0.3,pointRadius:3}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9},callback:v=>v+'€'},grid:{color:gc.g}}}});
+      mk('c_dr7','line',{labels:['2008','2010','2013','2015','2018','2020','2022','2024'],datasets:[{label:'Grand Narbonne',data:[11,13,14.5,15.7,13.5,12.1,11.8,11.0],borderColor:'#FF3D50',backgroundColor:'rgba(255,61,80,0.05)',borderWidth:2,fill:true,tension:0.4,pointRadius:3},{label:'France',data:[7.4,9.3,10.4,10.4,9.0,8.0,7.3,7.2],borderColor:'#4A5870',borderWidth:1.5,borderDash:[5,5],pointRadius:0,tension:0.4}]},{responsive:true,plugins:{legend:{labels:{color:gc.t,font:gc.f,boxWidth:10}}},scales:{x:{ticks:{color:gc.t,font:{size:9}},grid:{color:gc.g}},y:{ticks:{color:gc.t,font:{size:9},callback:v=>v+'%'},grid:{color:gc.g}}}});
+      mk('c_dr8','bar',{labels:['18-24 ans','25-49 ans','50-64 ans'],datasets:[{data:[26,10.5,9.2],backgroundColor:['#FF3D50','#A78BFA','#00C8F0'],borderWidth:0}]},{...hbarOpts(v=>v+'%')});
+      mk('c_dr9','bar',{labels:['Hôtellerie/Rest.','BTP','Commerce','Santé/Social','Transport','Numérique'],datasets:[{data:[120,85,72,65,48,18],backgroundColor:['#C9A84C','#00C8F0','#00E87A','#A78BFA','#5A7080','#FF3D50'],borderWidth:0}]},{...hbarOpts()});
+      mk('c_dr10','bar',{labels:['Narbonne','Port-la-N.','Coursan','Gruissan','Fleury','Moussan','Autres (31)'],datasets:[{data:[57765,6100,5800,5200,4100,3200,54760],backgroundColor:['#C9A84C','#00E87A','#00C8F0','#00C8F0','#00C8F0','#00C8F0','#4A5870'],borderWidth:0}]},{...hbarOpts(v=>(v/1000).toFixed(1)+'k')});
+      mk('c_dr11','doughnut',{labels:['Narbonne (42%)','Port-la-N.','Coursan','Gruissan','Fleury','Autres'],datasets:[{data:[57765,6100,5800,5200,4100,57960],backgroundColor:['#C9A84C','#00E87A','#00C8F0','#A78BFA','#5A7080','#1A2030'],borderColor:'#07090E',borderWidth:3}]},{...doughOpts()});
+    }
+  },300);
+}
+
+function enter(r){
+  role=r;
+  const cfg=ROLES[r];
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').classList.add('on');
+  const rp=document.getElementById('rpill');
+  rp.textContent=cfg.name;rp.style.color=cfg.col;rp.style.borderColor=cfg.col;
+  document.getElementById('tabs').innerHTML=cfg.tabs.map((t,i)=>`<button class="tbtn${i===0?' on':''}" data-idx="${i}" onclick="switchTab(this)">${t}</button>`).join('');
+  document.getElementById('chips').innerHTML=cfg.chips.map(c=>`<div class="chip" onclick="askIA('${c.replace(/'/g,"\\'")}')">${c}</div>`).join('');
+  renderTab(0);
+  buildCharts(r);
+}
+
+function renderTab(idx){
+  const html=CONTENT[role][idx]||'<div class="card"><div class="ct">Données à venir</div><p style="color:var(--gris2);font-size:0.8rem">Ce module sera alimenté par les données internes de la collectivité.</p></div>';
+  document.getElementById('main').innerHTML=`<div class="panel on">${html}</div>`;
+}
+
+function switchTab(btn){
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('iaresp').classList.remove('on');
+  const idx=parseInt(btn.dataset.idx);
+  renderTab(idx);
+  buildCharts(role);
+}
+
+function logout(){
+  killCharts();
+  document.getElementById('login').style.display='flex';
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('iaresp').classList.remove('on');
+  document.getElementById('iain').value='';
+  role=null;
+}
+
+function askIA(q){document.getElementById('iain').value=q;runIA();}
+function runIA(){
+  if(!role)return;
+  const q=document.getElementById('iain').value.trim();if(!q)return;
+  const box=document.getElementById('iaresp');
+  box.innerHTML='<span style="color:var(--or)">⬡ Analyse territoriale en cours...</span>';
+  box.classList.add('on');
+  const ia=ROLES[role].ia;let resp=ia.d;
+  const ql=q.toLowerCase();
+  if(ql.includes('risque')||ql.includes('politi'))resp=ia.risque||resp;
+  if(ql.includes('compar')||ql.includes('voisin'))resp=ia.compa||resp;
+  if(ql.includes('commerce')||ql.includes('centre'))resp=ia.commerce||resp;
+  if(ql.includes('service')||ql.includes('press'))resp=ia.pression||resp;
+  setTimeout(()=>{box.innerHTML=resp;},950);
+}
+document.getElementById('iain').addEventListener('keypress',e=>{if(e.key==='Enter')runIA();});
+function tick(){document.getElementById('clk').textContent=new Date().toLocaleTimeString('fr-FR');}
+setInterval(tick,1000);tick();
+</script>
+</body>
+</html>

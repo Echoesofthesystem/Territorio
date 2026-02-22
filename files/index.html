@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TERRITORIO — Intelligence Territoriale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:   #08090C;
+      --ink2:  #0D0F15;
+      --ink3:  #12151E;
+      --gold:  #B8963E;
+      --gold2: #D4AD5A;
+      --gold3: #EDD485;
+      --mist:  rgba(184,150,62,0.06);
+      --line:  rgba(184,150,62,0.12);
+      --line2: rgba(184,150,62,0.06);
+      --text:  #C8D0DC;
+      --text2: #68788C;
+      --text3: #38485A;
+      --white: #EEF2F8;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--ink);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CURSOR ─────────────────────────── */
+    #cur {
+      position: fixed; width: 5px; height: 5px;
+      background: var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: width .18s, height .18s, opacity .18s;
+      box-shadow: 0 0 8px var(--gold);
+    }
+    #cur-ring {
+      position: fixed; width: 28px; height: 28px;
+      border: 1px solid rgba(184,150,62,0.35);
+      border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+    }
+
+    /* ── CANVAS ─────────────────────────── */
+    #cv {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0; opacity: 0.25;
+    }
+
+    /* ── GRAIN ──────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1; opacity: 0.5;
+    }
+
+    /* ── VIGNETTE ───────────────────────── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(8,9,12,.7) 100%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── SUBTLE GRID ────────────────────── */
+    .grid-bg {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(var(--line2) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line2) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none; z-index: 0;
+      mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 80%);
+    }
+
+    section, nav, footer { position: relative; z-index: 2; }
+
+    /* ── NAV ────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 4rem; height: 68px;
+      background: rgba(8,9,12,0);
+      transition: background .5s, border-color .5s;
+      border-bottom: 1px solid transparent;
+    }
+    nav.scrolled {
+      background: rgba(8,9,12,0.92);
+      backdrop-filter: blur(32px);
+      border-bottom-color: var(--line);
+    }
+
+    .nav-logo {
+      font-family: 'Outfit', sans-serif;
+      font-size: .78rem; font-weight: 400;
+      letter-spacing: .38em; color: var(--white);
+      text-transform: uppercase;
+    }
+    .nav-logo em { font-style: normal; color: var(--gold); }
+
+    .nav-center {
+      display: flex; gap: 3rem; list-style: none;
+      position: absolute; left: 50%; transform: translateX(-50%);
+    }
+    .nav-center a {
+      font-size: .68rem; font-weight: 300; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--text2);
+      text-decoration: none; transition: color .25s;
+    }
+    .nav-center a:hover { color: var(--gold2); }
+
+    .nav-cta {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .65rem; font-weight: 300; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--gold);
+      text-decoration: none;
+      padding: .4rem 1.1rem;
+      border: 1px solid var(--line);
+      transition: all .25s;
+    }
+    .nav-cta:hover { border-color: var(--gold); background: rgba(184,150,62,.05); }
+    .nav-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: #3EE87A; box-shadow: 0 0 5px #3EE87A;
+      animation: blink 2.5s ease infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── HERO ───────────────────────────── */
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      padding: 0 4rem 5rem;
+      padding-top: 68px;
+    }
+
+    .hero-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 4rem;
+    }
+
+    .hero-tag {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 3.5rem;
+      opacity: 0; animation: fadeUp .8s ease .1s forwards;
+    }
+    .hero-tag-line { width: 24px; height: 1px; background: var(--gold); opacity: .6; }
+    .hero-tag-text {
+      font-size: .6rem; font-weight: 300; letter-spacing: .28em;
+      color: var(--gold); text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── TITRE CINÉMATIQUE ─────────────── */
+    /* ── TITRE CINÉMATIQUE ─────────────── */
+    .hero-h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(4rem, 8.5vw, 9rem);
+      font-weight: 300;
+      line-height: .95;
+      letter-spacing: -.01em;
+      margin-bottom: 3rem;
+    }
+    .hero-h1 .wl {
+      display: block;
+      overflow: hidden;
+      padding-bottom: .06em;
+    }
+    .hero-h1 .wl.ol {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(184,150,62,.28);
+    }
+    .hero-h1 .w {
+      display: inline-block;
+      transform: translateY(105%);
+      opacity: 0;
+      animation: wRev 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .hero-h1 .w + .w { margin-left: .28em; }
+    .hero-h1 .gold { color: var(--gold2); -webkit-text-stroke: 0; }
+    .w1{animation-delay:.06s}.w2{animation-delay:.2s}.w3{animation-delay:.34s}
+    .w4{animation-delay:.48s}.w5{animation-delay:.62s}.w6{animation-delay:.76s}
+    @keyframes wRev { to { transform: translateY(0); opacity: 1; } }
+
+    .hero-body {
+      max-width: 480px;
+      font-size: .95rem; font-weight: 300; line-height: 1.85;
+      color: var(--text2); margin-bottom: 3rem;
+      opacity: 0; animation: fadeUp .85s ease .92s forwards;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1.5rem; align-items: center;
+      opacity: 0; animation: fadeUp .85s ease 1.08s forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: .7rem;
+      padding: .85rem 2rem;
+      background: var(--gold);
+      color: var(--ink);
+      font-family: 'Outfit', sans-serif;
+      font-size: .7rem; font-weight: 500; letter-spacing: .16em;
+      text-transform: uppercase; text-decoration: none;
+      transition: all .25s; position: relative; overflow: hidden;
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.12));
+      opacity: 0; transition: opacity .25s;
+    }
+    .btn-primary:hover::after { opacity: 1; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(184,150,62,.25); }
+
+    .btn-text {
+      font-size: .68rem; font-weight: 300; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--text2);
+      text-decoration: none; transition: color .25s;
+      border-bottom: 1px solid transparent;
+    }
+    .btn-text:hover { color: var(--gold2); border-bottom-color: rgba(184,150,62,.3); }
+
+    /* ── HERO BOTTOM BAR ────────────────── */
+    .hero-bar {
+      display: flex;
+      border-top: 1px solid var(--line);
+      opacity: 0; animation: fadeIn 1s ease 1.25s forwards;
+    }
+    .hero-bar-item {
+      flex: 1; padding: 1.8rem 1.5rem;
+      border-right: 1px solid var(--line);
+      transition: background .3s;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .hero-bar-item:last-child { border-right: none; }
+    .hero-bar-item:hover { background: var(--mist); }
+    .hbi-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.85rem; font-weight: 400;
+      color: var(--gold2); margin-bottom: .25rem;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .hbi-val.red { color: #D45A6A; }
+    .hbi-val.green { color: #3EE87A; }
+    .hbi-val.blue { color: #50C8E8; }
+    .hbi-label {
+      font-size: .6rem; font-weight: 400; letter-spacing: .14em;
+      color: #8A9BB0; text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: .2rem;
+    }
+    .hbi-src {
+      font-size: .55rem; color: #566070;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .07em;
+    }
+
+    /* ── TICKER ─────────────────────────── */
+    .ticker {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: var(--ink2);
+      overflow: hidden; padding: .55rem 0; z-index: 10;
+    }
+    .ticker-inner {
+      display: flex; gap: 4rem;
+      animation: slide 35s linear infinite;
+      white-space: nowrap; width: max-content;
+    }
+    .t-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .6rem; font-weight: 300;
+      letter-spacing: .1em; color: var(--text3);
+      display: flex; align-items: center; gap: .7rem;
+    }
+    .t-item strong { color: var(--gold); font-weight: 400; }
+    .t-sep { color: var(--gold); opacity: .3; font-size: .5rem; }
+    @keyframes slide { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+    /* ── SECTION BASE ───────────────────── */
+    .s-label {
+      display: flex; align-items: center; gap: .9rem; margin-bottom: 1.2rem;
+    }
+    .s-label-rule { width: 20px; height: 1px; background: var(--gold); opacity: .5; }
+    .s-label-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .58rem; font-weight: 300; letter-spacing: .22em;
+      color: var(--gold); text-transform: uppercase;
+    }
+
+    .s-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 4vw, 3.8rem);
+      font-weight: 300; line-height: 1.05; letter-spacing: -.01em;
+      color: var(--white);
+    }
+    .s-title .gold { color: var(--gold2); }
+    .s-title .dim {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(184,150,62,.25);
+    }
+
+    /* ── PROBLEM ────────────────────────── */
+    .problem { padding: 11rem 4rem; }
+    .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: start; }
+    .problem-left .s-title { margin-bottom: 2.5rem; }
+    .problem-lead {
+      font-size: .95rem; font-weight: 300; line-height: 1.9;
+      color: var(--text2); margin-bottom: 2.5rem;
+    }
+    .problem-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-style: italic; font-weight: 300;
+      line-height: 1.7; color: rgba(212,173,90,.65);
+      border-left: 1px solid rgba(184,150,62,.25);
+      padding-left: 1.5rem;
+    }
+
+    .problem-items { display: flex; flex-direction: column; gap: 1px; }
+    .p-item {
+      padding: 1.5rem 1.5rem;
+      background: var(--ink2);
+      border: 1px solid var(--line2);
+      border-bottom: none;
+      display: flex; gap: 1.4rem; align-items: flex-start;
+      transition: background .3s, border-color .3s;
+      position: relative; overflow: hidden;
+    }
+    .p-item:last-child { border-bottom: 1px solid var(--line2); }
+    .p-item::before {
+      content: ''; position: absolute;
+      left: 0; top: 0; bottom: 0; width: 0;
+      background: var(--gold); transition: width .3s;
+    }
+    .p-item:hover::before { width: 1px; }
+    .p-item:hover { background: var(--ink3); }
+    .p-item-n {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 300; color: var(--text3);
+      line-height: 1; flex-shrink: 0; margin-top: .1rem;
+    }
+    .p-item-title {
+      font-size: .82rem; font-weight: 400; color: var(--text);
+      margin-bottom: .35rem; letter-spacing: .02em;
+    }
+    .p-item-text { font-size: .78rem; font-weight: 300; color: var(--text2); line-height: 1.7; }
+
+    /* ── SOLUTION ───────────────────────── */
+    .solution { padding: 11rem 4rem; background: var(--ink2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .solution-head { text-align: center; max-width: 680px; margin: 0 auto 6rem; }
+    .solution-head .s-label { justify-content: center; }
+
+    .layers { display: grid; grid-template-columns: repeat(3,1fr); }
+    .layer {
+      padding: 3.5rem 2.5rem;
+      border-right: 1px solid var(--line2);
+      transition: background .3s;
+      position: relative; overflow: hidden;
+    }
+    .layer:last-child { border-right: none; }
+    .layer::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .5s ease;
+    }
+    .layer.l1::after { background: var(--gold2); }
+    .layer.l2::after { background: #50C8E8; }
+    .layer.l3::after { background: #3EE87A; }
+    .layer:hover { background: rgba(184,150,62,.02); }
+    .layer:hover::after { transform: scaleX(1); }
+
+    .layer-n {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem; font-weight: 300; line-height: 1;
+      margin-bottom: 2rem;
+    }
+    .l1 .layer-n { color: rgba(184,150,62,.08); }
+    .l2 .layer-n { color: rgba(80,200,232,.08); }
+    .l3 .layer-n { color: rgba(62,232,122,.08); }
+
+    .layer-tag {
+      display: inline-block; margin-bottom: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .55rem; font-weight: 300; letter-spacing: .18em;
+      text-transform: uppercase; padding: .18rem .55rem;
+      border: 1px solid;
+    }
+    .l1 .layer-tag { color: var(--gold); border-color: rgba(184,150,62,.2); }
+    .l2 .layer-tag { color: #50C8E8; border-color: rgba(80,200,232,.2); }
+    .l3 .layer-tag { color: #3EE87A; border-color: rgba(62,232,122,.2); }
+
+    .layer-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem; font-weight: 400; color: var(--white);
+      margin-bottom: .9rem; line-height: 1.2;
+    }
+    .layer-desc { font-size: .8rem; font-weight: 300; color: var(--text2); line-height: 1.85; margin-bottom: 2rem; }
+    .layer-list { list-style: none; }
+    .layer-list li {
+      font-size: .72rem; font-weight: 300; color: var(--text2);
+      font-family: 'JetBrains Mono', monospace; letter-spacing: .04em;
+      padding: .35rem 0; border-bottom: 1px solid var(--line2);
+      display: flex; gap: .6rem; align-items: center;
+    }
+    .layer-list li:last-child { border: none; }
+    .l1 .layer-list li::before { content: '—'; color: var(--gold); opacity: .5; font-size: .65rem; }
+    .l2 .layer-list li::before { content: '—'; color: #50C8E8; opacity: .5; font-size: .65rem; }
+    .l3 .layer-list li::before { content: '—'; color: #3EE87A; opacity: .5; font-size: .65rem; }
+
+    /* ── NUMBERS ────────────────────────── */
+    .numbers { padding: 0 4rem; border-bottom: 1px solid var(--line); }
+    .numbers-grid { display: grid; grid-template-columns: repeat(5,1fr); }
+    .n-item {
+      padding: 3.5rem 0;
+      border-right: 1px solid var(--line2);
+      transition: background .3s;
+    }
+    .n-item:last-child { border-right: none; }
+    .n-item:hover { background: var(--mist); }
+    .n-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.8rem; font-weight: 300; line-height: 1;
+      margin-bottom: .5rem;
+      transition: color .1s;
+      font-variant-numeric: tabular-nums;
+    }
+    /* Pendant le scramble : légère opacité réduite et monospace */
+    .n-val.scrambling {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      opacity: .7;
+      letter-spacing: .04em;
+    }
+    .n-item:nth-child(1) .n-val { color: var(--gold2); }
+    .n-item:nth-child(2) .n-val { color: #50C8E8; }
+    .n-item:nth-child(3) .n-val { color: #3EE87A; }
+    .n-item:nth-child(4) .n-val { color: #D45A6A; }
+    .n-item:nth-child(5) .n-val { color: var(--gold2); }
+    .n-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .56rem; font-weight: 300; letter-spacing: .14em;
+      color: var(--text3); text-transform: uppercase; line-height: 1.5;
+    }
+    .n-src { font-size: .5rem; color: var(--text3); font-family: 'JetBrains Mono', monospace; margin-top: .35rem; opacity: .7; }
+
+    /* ── DATA SOURCES ───────────────────── */
+    .data { padding: 11rem 4rem; }
+    .data-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 8rem; align-items: center; }
+
+    .data-sources { display: grid; grid-template-columns: 1fr 1fr; }
+    .src {
+      padding: 1.5rem 0 1.5rem 1.5rem;
+      border: 1px solid var(--line2);
+      border-right: none; border-bottom: none;
+      transition: background .25s;
+    }
+    .src:nth-child(2n) { padding-left: 1.5rem; border-right: 1px solid var(--line2); }
+    .src:nth-last-child(-n+2) { border-bottom: 1px solid var(--line2); }
+    .src:hover { background: var(--mist); }
+    .src-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 400; margin-bottom: .3rem;
+    }
+    .src-name.g { color: var(--gold2); }
+    .src-name.c { color: #50C8E8; }
+    .src-name.v { color: #3EE87A; }
+    .src-desc { font-size: .72rem; font-weight: 300; color: var(--text2); line-height: 1.6; }
+
+    .data-right .s-title { margin-bottom: 1.8rem; }
+    .data-body { font-size: .88rem; font-weight: 300; color: var(--text2); line-height: 1.9; margin-bottom: 1.5rem; }
+    .data-callout {
+      border-left: 1px solid rgba(184,150,62,.3);
+      padding: 1.2rem 1.5rem;
+      background: var(--mist);
+    }
+    .data-callout-title {
+      font-size: .68rem; font-weight: 400; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: .4rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .data-callout p { font-size: .8rem; font-weight: 300; color: var(--text2); line-height: 1.75; }
+
+    /* ── PROFILES ───────────────────────── */
+    .profiles { padding: 11rem 4rem; background: var(--ink2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .profiles-head { max-width: 600px; margin-bottom: 5rem; }
+    .profiles-head .s-title { margin-top: 1rem; }
+    .profiles-grid { display: grid; grid-template-columns: repeat(4,1fr); }
+    .profile {
+      padding: 2.5rem 2rem;
+      border-right: 1px solid var(--line2);
+      transition: all .3s; text-decoration: none;
+      display: block; position: relative; overflow: hidden;
+    }
+    .profile:last-child { border-right: none; }
+    .profile::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .4s ease;
+    }
+    .profile.pr1::before { background: var(--gold2); }
+    .profile.pr2::before { background: #50C8E8; }
+    .profile.pr3::before { background: #3EE87A; }
+    .profile.pr4::before { background: var(--gold3); }
+    .profile:hover::before { transform: scaleX(1); }
+    .profile:hover { background: rgba(184,150,62,.02); }
+
+    .profile-icon { font-size: 1.5rem; margin-bottom: 1.2rem; opacity: .8; }
+    .profile-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-weight: 400; margin-bottom: .5rem;
+    }
+    .pr1 .profile-name { color: var(--gold2); }
+    .pr2 .profile-name { color: #50C8E8; }
+    .pr3 .profile-name { color: #3EE87A; }
+    .pr4 .profile-name { color: var(--gold3); }
+    .profile-desc { font-size: .76rem; font-weight: 300; color: var(--text2); line-height: 1.75; margin-bottom: 1.5rem; }
+    .profile-tags { display: flex; flex-direction: column; gap: .3rem; }
+    .ptag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .55rem; font-weight: 300; letter-spacing: .12em;
+      color: var(--text3); text-transform: uppercase;
+    }
+    .profile-arrow {
+      display: block; margin-top: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .58rem; letter-spacing: .14em;
+      color: var(--text3); text-transform: uppercase;
+      transition: color .25s, letter-spacing .25s;
+    }
+    .profile:hover .profile-arrow { color: var(--gold); letter-spacing: .22em; }
+
+    /* ── WHY NOW ────────────────────────── */
+    .why { padding: 11rem 4rem; }
+    .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line2); border: 1px solid var(--line2); margin-top: 5rem; }
+    .why-item {
+      padding: 2.5rem 2.5rem;
+      background: var(--ink);
+      transition: background .3s;
+    }
+    .why-item:hover { background: var(--ink2); }
+    .wi-n {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: .9rem; font-weight: 300; color: var(--text3);
+      margin-bottom: 1rem; font-style: italic;
+    }
+    .wi-title { font-size: .9rem; font-weight: 400; color: var(--white); margin-bottom: .65rem; letter-spacing: .01em; }
+    .wi-text { font-size: .79rem; font-weight: 300; color: var(--text2); line-height: 1.8; }
+    .wi-badge {
+      display: inline-block; margin-top: 1.2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .52rem; font-weight: 300; letter-spacing: .14em;
+      color: var(--gold); text-transform: uppercase; opacity: .7;
+    }
+
+    /* ── DEMO MOCKUP ────────────────────── */
+    .demo { padding: 11rem 4rem; background: var(--ink2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .demo-inner { display: grid; grid-template-columns: 1.1fr 1fr; gap: 7rem; align-items: center; }
+
+    .mockup-wrap { position: relative; }
+    .mockup-wrap::before {
+      content: '';
+      position: absolute; inset: -1px;
+      background: linear-gradient(135deg, rgba(184,150,62,.1), transparent 50%, rgba(80,200,232,.05));
+      pointer-events: none;
+    }
+
+    .mockup {
+      background: var(--ink3);
+      border: 1px solid var(--line);
+      overflow: hidden; position: relative;
+    }
+    .mockup::after {
+      content: '';
+      position: absolute; left: 0; right: 0; height: 80px;
+      background: linear-gradient(180deg, transparent, rgba(184,150,62,.03), transparent);
+      animation: scanM 4s ease-in-out infinite; pointer-events: none;
+    }
+    @keyframes scanM { 0%,100%{top:-80px} 50%{top:100%} }
+
+    .m-bar {
+      background: var(--ink2); border-bottom: 1px solid var(--line);
+      padding: .6rem 1rem; display: flex; align-items: center; gap: .8rem;
+    }
+    .m-dots { display: flex; gap: .3rem; }
+    .m-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .m-dot:nth-child(1){background:#D45A6A}.m-dot:nth-child(2){background:var(--gold)}.m-dot:nth-child(3){background:#3EE87A}
+    .m-url {
+      font-family: 'JetBrains Mono', monospace; font-size: .6rem;
+      color: var(--text3); flex: 1;
+    }
+
+    .m-body { padding: 1.2rem; }
+    .m-kpis { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; background: var(--line2); border: 1px solid var(--line2); margin-bottom: .8rem; }
+    .mk { background: var(--ink); padding: .75rem .8rem; }
+    .mk-v {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; font-weight: 400; margin-bottom: .1rem;
+    }
+    .mk:nth-child(1) .mk-v { color: var(--gold2); }
+    .mk:nth-child(2) .mk-v { color: #D45A6A; }
+    .mk:nth-child(3) .mk-v { color: #50C8E8; }
+    .mk:nth-child(4) .mk-v { color: #3EE87A; }
+    .mk-l { font-family: 'JetBrains Mono', monospace; font-size: .5rem; color: var(--text3); letter-spacing: .1em; }
+
+    .m-chart { height: 64px; background: var(--ink); border: 1px solid var(--line2); display: flex; align-items: flex-end; padding: .5rem; gap: 3px; margin-bottom: .8rem; }
+    .mb { flex: 1; min-height: 3px; transition: opacity .2s; }
+    .mb:hover { opacity: .9!important; }
+
+    .m-profiles { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--line2); }
+    .mpr { background: var(--ink); padding: .45rem; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: .5rem; color: var(--text3); }
+    .mpr:nth-child(1){color:var(--gold)}.mpr:nth-child(2){color:#50C8E8}.mpr:nth-child(3){color:#3EE87A}.mpr:nth-child(4){color:var(--gold3)}
+
+    .demo-text .s-title { margin-bottom: 1.5rem; }
+    .demo-body { font-size: .88rem; font-weight: 300; color: var(--text2); line-height: 1.9; margin-bottom: 2rem; }
+    .demo-feats { margin-bottom: 2.5rem; display: flex; flex-direction: column; gap: .6rem; }
+    .df {
+      display: flex; align-items: baseline; gap: .8rem;
+      font-size: .78rem; font-weight: 300; color: var(--text2);
+    }
+    .df::before { content: '—'; color: var(--gold); opacity: .5; font-size: .65rem; flex-shrink: 0; }
+
+    /* ── CTA ────────────────────────────── */
+    .cta { padding: 13rem 4rem; text-align: center; position: relative; overflow: hidden; }
+    .cta-glow {
+      position: absolute; width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(184,150,62,.04) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .cta-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .58rem; font-weight: 300; letter-spacing: .26em;
+      color: var(--gold); text-transform: uppercase;
+      margin-bottom: 2rem; opacity: .8;
+    }
+    .cta-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 7vw, 7.5rem);
+      font-weight: 300; line-height: .92; letter-spacing: -.02em;
+      max-width: 900px; margin: 0 auto 2rem;
+    }
+    .cta-title .solid { display: block; color: var(--white); }
+    .cta-title .outline {
+      display: block; color: transparent;
+      -webkit-text-stroke: 1px rgba(184,150,62,.25);
+    }
+    .cta-title .gold { color: var(--gold2); -webkit-text-stroke: 0; }
+    .cta-sub {
+      font-size: .92rem; font-weight: 300; color: var(--text2);
+      line-height: 1.85; max-width: 440px; margin: 0 auto 3.5rem;
+    }
+    .cta-btns { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+    .cta-note {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .55rem; font-weight: 300; letter-spacing: .14em;
+      color: var(--text3); text-transform: uppercase;
+    }
+
+    /* ── CONTACT ────────────────────────── */
+    .contact { padding: 3rem 4rem 8rem; }
+    .contact-box {
+      max-width: 540px; margin: 0 auto;
+      border: 1px solid var(--line);
+      padding: 3rem;
+    }
+    .contact-box h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 300; color: var(--white);
+      margin-bottom: .5rem;
+    }
+    .contact-box p { font-size: .8rem; font-weight: 300; color: var(--text2); line-height: 1.75; margin-bottom: 2rem; }
+    .f-field {
+      display: block; width: 100%;
+      background: transparent; border: none;
+      border-bottom: 1px solid var(--line); color: var(--text);
+      padding: .75rem 0; font-family: 'Outfit', sans-serif;
+      font-size: .85rem; font-weight: 300; outline: none;
+      transition: border-color .25s; margin-bottom: 1.2rem;
+    }
+    .f-field:focus { border-bottom-color: var(--gold); }
+    .f-field::placeholder { color: var(--text3); }
+    textarea.f-field { resize: vertical; min-height: 80px; }
+    #fok {
+      display: none; margin-top: 1rem; padding: .8rem 1rem;
+      border: 1px solid rgba(62,232,122,.2);
+      background: rgba(62,232,122,.04);
+      color: #3EE87A; font-size: .75rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── FOOTER ─────────────────────────── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 2rem 4rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .foot-logo { font-family: 'Outfit', sans-serif; font-size: .72rem; font-weight: 400; letter-spacing: .38em; color: var(--text2); }
+    .foot-logo em { font-style: normal; color: var(--gold); }
+    .foot-links { display: flex; gap: 2.5rem; list-style: none; }
+    .foot-links a { font-size: .6rem; font-weight: 300; letter-spacing: .16em; color: var(--text3); text-decoration: none; text-transform: uppercase; transition: color .2s; }
+    .foot-links a:hover { color: var(--gold); }
+    .foot-copy { font-family: 'JetBrains Mono', monospace; font-size: .52rem; color: var(--text3); letter-spacing: .08em; }
+
+    /* ── SCROLL REVEAL ───────────────────── */
+    .r { opacity: 0; transform: translateY(22px); transition: opacity .85s ease, transform .85s ease; }
+    .r.v { opacity: 1; transform: translateY(0); }
+    .d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}.d5{transition-delay:.4s}
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    /* ── RESPONSIVE ─────────────────────── */
+    @media(max-width:1100px){
+      .data-grid,.demo-inner { gap:4rem }
+      .layers,.profiles-grid { grid-template-columns:1fr 1fr }
+      .layer { border-bottom: 1px solid var(--line2); }
+    }
+
+    @media(max-width:768px){
+      body { cursor: auto; }
+      #cur,#cur-ring { display: none; }
+
+      nav { padding: 0 1.5rem; height: 58px; }
+      .nav-center { display: none; }
+      .nav-cta { font-size: .6rem; padding: .35rem .85rem; }
+
+      .hero { padding: 0 1.5rem 3rem; min-height: 100svh; }
+      .hero-main { padding-top: 3rem; }
+      .hero-tag { margin-bottom: 2rem; }
+      .hero-h1 { font-size: clamp(3rem,13vw,5.5rem); margin-bottom: 2rem; }
+      .hero-body { font-size: .88rem; margin-bottom: 2rem; max-width: 100%; }
+      .hero-actions { flex-direction: column; align-items: stretch; gap: .8rem; }
+      .btn-primary { justify-content: center; }
+      .btn-text { text-align: center; }
+      .hero-bar { flex-direction: column; }
+      .hero-bar-item { border-right: none; border-bottom: 1px solid var(--line); padding: 1.2rem 0; }
+      .hero-bar-item:last-child { border-bottom: none; }
+
+      .problem,.solution,.data,.profiles,.why,.demo,.cta { padding: 5rem 1.5rem; }
+      .contact { padding: 2rem 1.5rem 5rem; }
+      footer { padding: 1.5rem; flex-direction: column; gap: 1rem; text-align: center; }
+
+      .problem-grid,.data-grid,.demo-inner,.why-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .demo-inner > .mockup-wrap { order: 2; }
+      .demo-inner > .demo-text { order: 1; }
+
+      .layers,.profiles-grid { grid-template-columns: 1fr; }
+      .layer { border-right: none; }
+      .profile { border-right: none; border-bottom: 1px solid var(--line2); }
+      .profile:last-child { border-bottom: none; }
+
+      .numbers-grid { grid-template-columns: repeat(2,1fr); }
+      .n-item { border-right: none; border-bottom: 1px solid var(--line2); padding: 2rem 0; }
+      .n-item:nth-child(odd) { border-right: 1px solid var(--line2); }
+      .n-item:last-child { border-bottom: none; }
+
+      .data-sources { grid-template-columns: 1fr; }
+      .src,.src:nth-child(2n) { border-right: 1px solid var(--line2); border-bottom: none; }
+      .src:last-child { border-bottom: 1px solid var(--line2); }
+
+      .s-title { font-size: clamp(1.8rem,8vw,2.5rem); }
+      .cta-title { font-size: clamp(2.8rem,11vw,4.5rem); }
+      .foot-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+    }
+
+    @media(max-width:380px){
+      .hero-h1 { font-size: 2.8rem; }
+      .numbers-grid { grid-template-columns: 1fr; }
+      .n-item:nth-child(odd) { border-right: none; }
+    }
+
+    /* ── EFFET CURSEUR TERMINAL ─────────── */
+    /* Underscore clignotant après les chiffres pendant le scramble */
+    [data-count].scrambling::after {
+      content: '_';
+      animation: blinkUnd .5s step-end infinite;
+      color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7em;
+      margin-left: 1px;
+    }
+    @keyframes blinkUnd { 0%,100%{opacity:1} 50%{opacity:0} }
+
+
+    /* ── ② CARTE SVG TERRITOIRE — SOMPTUEUSE ── */
+    .hero-map {
+      position: absolute;
+      right: -2%; top: 0; bottom: 0;
+      width: 56%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: visible;
+    }
+    .hero-map svg {
+      position: absolute;
+      right: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 100%; height: auto;
+      opacity: 0;
+      animation: mapFadeIn 2.2s ease 1.2s forwards;
+      overflow: visible;
+    }
+    @keyframes mapFadeIn { 0%{opacity:0} 100%{opacity:1} }
+
+    /* Communes — état de base */
+    .com {
+      fill: rgba(184,150,62,0.028);
+      stroke: rgba(184,150,62,0.22);
+      stroke-width: 0.7;
+      stroke-linejoin: round;
+      cursor: default;
+      transition: fill .4s ease, stroke .4s ease, filter .4s ease;
+      pointer-events: none; /* décoratif dans hero */
+    }
+    /* Allumage séquentiel */
+    .com.lit {
+      fill: rgba(184,150,62,0.055);
+      stroke: rgba(212,173,90,0.5);
+    }
+    /* Narbonne — commune principale */
+    .com-main {
+      fill: rgba(184,150,62,0.07);
+      stroke: rgba(212,173,90,0.55);
+      stroke-width: 1.1;
+    }
+    .com-main.lit {
+      fill: rgba(184,150,62,0.13);
+      stroke: rgba(237,212,133,0.75);
+      filter: drop-shadow(0 0 6px rgba(184,150,62,0.25));
+    }
+    /* Littoral — trait cyan */
+    .com-coast {
+      stroke: rgba(80,200,232,0.2);
+    }
+    .com-coast.lit {
+      stroke: rgba(80,200,232,0.45);
+      fill: rgba(80,200,232,0.04);
+    }
+
+    /* Beacon Narbonne */
+    .beacon-dot {
+      fill: #D4AD5A;
+      filter: drop-shadow(0 0 5px rgba(212,173,90,0.9));
+    }
+    .beacon-ring {
+      fill: none;
+      stroke: rgba(212,173,90,0.35);
+      stroke-width: 0.8;
+      animation: bRing 3.2s ease-out infinite;
+    }
+    .beacon-ring2 { animation-delay: 1.6s; }
+    @keyframes bRing {
+      0%   { r: 5;  opacity:.7; }
+      100% { r: 32; opacity:0;  }
+    }
+    /* Beacon secondaires */
+    .beacon-sec {
+      fill: rgba(80,200,232,0.7);
+      filter: drop-shadow(0 0 3px rgba(80,200,232,0.8));
+      animation: secPulse 4s ease-in-out infinite;
+    }
+    @keyframes secPulse { 0%,100%{opacity:.4} 50%{opacity:.9} }
+
+    /* Reticule / coordonnées */
+    .ret { stroke: rgba(184,150,62,0.055); stroke-width:.4; stroke-dasharray: 3 7; }
+    .ret-solid { stroke: rgba(184,150,62,0.08); stroke-width:.3; }
+
+    /* Labels carte */
+    .map-txt {
+      font-family: 'JetBrains Mono', monospace;
+      fill: rgba(184,150,62,0.4);
+      font-size: 5.5px; letter-spacing: .18em; text-transform: uppercase;
+      pointer-events: none;
+    }
+    .map-txt-dim { fill: rgba(184,150,62,0.16); font-size:4.5px; }
+    .map-txt-coord { fill: rgba(184,150,62,0.14); font-size: 4px; letter-spacing:.06em; }
+
+    /* Masque de fondu sur les bords gauche/haut/bas */
+    .hero-map::before {
+      content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+      background:
+        linear-gradient(to right, var(--ink) 0%, rgba(8,9,12,.6) 18%, transparent 38%),
+        linear-gradient(to bottom, var(--ink) 0%, transparent 22%),
+        linear-gradient(to top,    var(--ink) 0%, transparent 22%);
+    }
+
+    /* Glow global derrière la carte */
+    .map-glow {
+      position: absolute;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(184,150,62,.06) 0%, transparent 70%);
+      top: 50%; left: 35%;
+      transform: translate(-50%,-50%);
+      pointer-events: none; z-index: 0;
+      animation: glowPulse 5s ease-in-out infinite;
+    }
+    @keyframes glowPulse { 0%,100%{opacity:.6} 50%{opacity:1} }
+
+    .hero { position: relative; }
+    .hero-main { position: relative; z-index: 2; }
+
+        /* ── ④ PARALLAXE ────────────────────── */
+    .hero-main { will-change: transform; }
+    .hero-bar  { will-change: transform; }
+    /* Les sections qui ont un parallaxe léger */
+    .parallax-bg { will-change: transform; }
+
+    /* ── ⑤ CURSEUR MORPHANT ─────────────── */
+    /* Le curseur change de forme selon la section active */
+    #cur-label {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9997;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .55rem;
+      color: rgba(184,150,62,0.7);
+      letter-spacing: .12em;
+      transform: translate(14px, -50%);
+      opacity: 0;
+      transition: opacity .25s;
+      white-space: nowrap;
+    }
+    #cur-label.visible { opacity: 1; }
+
+    /* Curseur : forme par défaut = rond -->  */
+    #cur       { transition: width .25s, height .25s, border-radius .25s, background .25s, transform .25s; }
+    #cur-ring  { transition: width .2s, height .2s, border-color .2s, border-radius .2s, transform .2s; }
+
+    /* État "croix" dans section solution */
+    #cur.cross {
+      border-radius: 0;
+      width: 10px; height: 2px;
+      background: var(--gold);
+    }
+    #cur.cross::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%,-50%);
+      width: 2px; height: 10px;
+      background: var(--gold);
+    }
+    /* État "flèche" dans profils */
+    #cur.arrow {
+      width: 6px; height: 6px;
+      border-radius: 0;
+      clip-path: polygon(0 50%, 60% 0, 60% 35%, 100% 35%, 100% 65%, 60% 65%, 60% 100%);
+    }
+    /* État "cercle plein" dans CTA */
+    #cur.cta-mode {
+      width: 16px; height: 16px;
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      box-shadow: none;
+    }
+    #cur.cta-mode.filled {
+      background: var(--gold);
+      box-shadow: 0 0 12px var(--gold);
+    }
+
+    /* ── TOOLTIP COMMUNE ────────────────── */
+    #map-tooltip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9990;
+      background: rgba(8,9,12,0.95);
+      border: 1px solid rgba(184,150,62,0.25);
+      border-left: 2px solid var(--gold);
+      padding: .65rem 1rem;
+      backdrop-filter: blur(20px);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .2s ease, transform .2s ease;
+      min-width: 160px;
+    }
+    #map-tooltip.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .tt-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: .95rem; font-weight: 400;
+      color: var(--gold2); margin-bottom: .35rem;
+    }
+    .tt-row {
+      display: flex; justify-content: space-between; gap: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .52rem; color: var(--text2);
+      letter-spacing: .06em; padding: .12rem 0;
+      border-bottom: 1px solid rgba(184,150,62,.06);
+    }
+    .tt-row:last-child { border: none; }
+    .tt-val { color: var(--text); font-weight: 400; }
+    .tt-source {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .45rem; color: var(--text3);
+      letter-spacing: .08em; margin-top: .3rem;
+    }
+  </style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<canvas id="cv"></canvas>
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">TERRI<em>TO</em>RIO</div>
+  <ul class="nav-center">
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#data">Données</a></li>
+    <li><a href="#demo">Démo</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="dashboard.html" class="nav-cta"><span class="nav-dot"></span>Dashboard live</a>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-main">
+    <div class="hero-tag">
+      <div class="hero-tag-line"></div>
+      <span class="hero-tag-text">Intelligence Territoriale — Grand Narbonne — Prototype Couche 1</span>
+    </div>
+
+    <h1 class="hero-h1">
+      <!-- Ligne 1 : chaque mot remonte séparément -->
+      <span class="wl">
+        <span class="w w1">Votre</span>
+        <span class="w w2">territoire</span>
+      </span>
+      <!-- Ligne 2 : outline + mot gold -->
+      <span class="wl ol">
+        <span class="w w3">vous</span>
+        <span class="w w4 gold">parle.</span>
+      </span>
+      <!-- Ligne 3 : outline -->
+      <span class="wl ol">
+        <span class="w w5">Enfin.</span>
+      </span>
+    </h1>
+
+    <p class="hero-body">
+      TERRITORIO transforme les données publiques de votre territoire en intelligence décisionnelle — pour les élus et la direction générale qui n'ont pas le temps de chercher.
+    </p>
+
+    <div class="hero-actions">
+      <a href="dashboard.html" class="btn-primary">Voir le dashboard →</a>
+      <a href="#solution" class="btn-text">Découvrir la solution</a>
+    </div>
+  </div>
+
+  <!-- Stats bar en bas du hero -->
+  <div class="hero-bar">
+    <div class="hero-bar-item">
+      <div class="hbi-val" data-count="136925">136 925</div>
+      <div class="hbi-label">Habitants</div>
+      <div class="hbi-src">BANATIC · 25/11/2024</div>
+    </div>
+    <div class="hero-bar-item">
+      <div class="hbi-val">37</div>
+      <div class="hbi-label">Communes · 846,6 km²</div>
+      <div class="hbi-src">Données officielles</div>
+    </div>
+    <div class="hero-bar-item">
+      <div class="hbi-val red">11,0%</div>
+      <div class="hbi-label">Taux de chômage</div>
+      <div class="hbi-src">INSEE BIT · France : 7,2%</div>
+    </div>
+    <div class="hero-bar-item">
+      <div class="hbi-val green">+ 759</div>
+      <div class="hbi-label">Créations d'entreprises / an</div>
+      <div class="hbi-src">SIRENE 2023</div>
+    </div>
+    <div class="hero-bar-item">
+      <div class="hbi-val blue">Port 2030</div>
+      <div class="hbi-label">Hub éolien offshore</div>
+      <div class="hbi-src">200+ emplois attendus</div>
+    </div>
+  </div>
+
+
+  <!-- ② CARTE SOMPTUEUSE — Grand Narbonne -->
+  <div class="hero-map" id="heroMap">
+    <div class="map-glow"></div>
+    <svg viewBox="0 0 580 680" xmlns="http://www.w3.org/2000/svg" id="mapSvg" style="overflow:visible">
+      <defs>
+        <filter id="glow1" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow2" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glowCyan" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- ── Grille de coordonnées ── -->
+      <line class="ret" x1="0" y1="170" x2="580" y2="170"/>
+      <line class="ret" x1="0" y1="290" x2="580" y2="290"/>
+      <line class="ret" x1="0" y1="410" x2="580" y2="410"/>
+      <line class="ret" x1="0" y1="530" x2="580" y2="530"/>
+      <line class="ret" x1="100" y1="0" x2="100" y2="680"/>
+      <line class="ret" x1="220" y1="0" x2="220" y2="680"/>
+      <line class="ret" x1="340" y1="0" x2="340" y2="680"/>
+      <line class="ret" x1="460" y1="0" x2="460" y2="680"/>
+
+      <!-- ══════════════════════════════════════
+           COMMUNES DU GRAND NARBONNE
+           37 communes — formes géographiques réelles (simplifiées)
+           Organisation géographique N→S, O→E
+      ══════════════════════════════════════ -->
+
+      <!-- ZONE NORD-OUEST : Minervois / Corbières -->
+      <!-- Mailhac -->
+      <polygon class="com" data-n="Mailhac"         data-delay="0"    points="58,82  108,72  118,98  95,118  60,112"/>
+      <!-- Caunes-Minervois direction -->
+      <polygon class="com" data-n="Ornaisons"       data-delay="120"  points="108,72  162,65  172,92  148,115  118,110"/>
+      <!-- Bizanet -->
+      <polygon class="com" data-n="Bizanet"          data-delay="240"  points="162,65  212,60  220,88  198,112  172,108"/>
+      <!-- Montséret -->
+      <polygon class="com" data-n="Montséret"        data-delay="360"  points="212,60  262,55  270,84  248,108  222,104"/>
+      <!-- Thézan-des-Corbières -->
+      <polygon class="com" data-n="Thézan-des-C."   data-delay="480"  points="262,55  315,52  322,80  300,105  272,100"/>
+      <!-- Villesèque-des-C. -->
+      <polygon class="com" data-n="Villesèque"       data-delay="600"  points="315,52  368,50  374,78  350,102  322,98"/>
+      <!-- Durban-Corbières -->
+      <polygon class="com" data-n="Durban-C."        data-delay="720"  points="368,50  420,48  428,76  405,100  374,96"/>
+      <!-- Roquefort-des-C. -->
+      <polygon class="com" data-n="Roquefort-des-C." data-delay="840" points="420,48  472,46  478,74  458,98  428,94"/>
+      <!-- Villeneuve-les-C. -->
+      <polygon class="com" data-n="Villeneuve-les-C." data-delay="960" points="472,46  524,48  528,76  506,100  478,96"/>
+
+      <!-- ZONE NORD : arc intérieur -->
+      <polygon class="com" data-n="Canet-d'Aude"    data-delay="80"   points="58,112  95,118  100,152  72,168  45,155"/>
+      <polygon class="com" data-n="Moussan"          data-delay="200"  points="95,118  148,115  152,148  122,168  100,160"/>
+      <polygon class="com" data-n="Névian"           data-delay="320"  points="148,115  198,112  202,145  172,168  152,155"/>
+      <polygon class="com" data-n="Marcorignan"      data-delay="440"  points="198,112  248,108  252,142  222,165  202,158"/>
+      <polygon class="com" data-n="Montredon"        data-delay="560"  points="248,108  300,105  304,138  274,162  252,156"/>
+      <polygon class="com" data-n="Fabrezan"         data-delay="680"  points="300,105  350,102  354,136  324,160  304,154"/>
+      <polygon class="com" data-n="Ferrals-les-C."  data-delay="800"  points="350,102  405,100  408,134  378,158  354,152"/>
+      <polygon class="com" data-n="Coustouge"        data-delay="920"  points="405,100  458,98  460,132  432,156  408,150"/>
+      <polygon class="com" data-n="Davejean"         data-delay="1040" points="458,98  524,100  525,134  495,158  460,150"/>
+
+      <!-- ZONE CENTRALE : ceinture de Narbonne -->
+      <polygon class="com" data-n="Vinassan"         data-delay="150"  points="45,155  72,168  68,205  40,215  22,195"/>
+      <polygon class="com" data-n="Coursan"          data-delay="270"  points="72,168  122,168  120,205  88,222  68,210"/>
+      <polygon class="com" data-n="Cuxac-d'Aude"    data-delay="390"  points="122,168  172,168  170,205  138,222  120,210"/>
+      <polygon class="com" data-n="Salles-d'Aude"   data-delay="510"  points="172,168  222,165  220,202  188,220  170,210"/>
+
+      <!-- NARBONNE — commune principale, forme précise -->
+      <polygon class="com com-main" data-n="Narbonne" data-delay="50"
+               points="222,165 274,162 278,198 268,240 238,265 200,268 170,248 165,210 188,190"/>
+
+      <polygon class="com" data-n="Armissan"         data-delay="630"  points="274,162  324,160  322,196  292,215  278,205"/>
+      <polygon class="com" data-n="Bages"            data-delay="750"  points="324,160  378,158  375,194  345,213  322,208"/>
+      <polygon class="com" data-n="Peyriac-de-Mer"  data-delay="870"  points="378,158  432,156  428,192  398,212  375,206"/>
+      <polygon class="com" data-n="Sigean"           data-delay="990"  points="432,156  495,158  490,195  460,215  428,208"/>
+
+      <!-- ZONE SUD-OUEST : étangs intérieurs -->
+      <polygon class="com" data-n="Fleury"           data-delay="300"  points="40,215  68,210  65,250  38,265  18,248"/>
+      <polygon class="com" data-n="Saint-Marcel"     data-delay="420"  points="68,210  120,210  118,248  85,265  65,255"/>
+      <polygon class="com" data-n="Sainte-Marie-la-Mer" data-delay="180" points="120,210 170,210 168,250 135,268 118,255"/>
+
+      <!-- GRUISSAN — littoral -->
+      <polygon class="com com-coast" data-n="Gruissan" data-delay="220"
+               points="135,268 170,260 200,268 205,308 178,332 142,328 120,305 115,280"/>
+
+      <!-- ZONE SUD : littoral méditerranéen -->
+      <polygon class="com" data-n="Leucate"          data-delay="1100" points="490,195  545,198  548,238  518,258  490,250"/>
+      <polygon class="com" data-n="La Palme"         data-delay="1000" points="460,215  490,210  492,252  462,272  438,262"/>
+      <polygon class="com com-coast" data-n="Port-la-Nouvelle" data-delay="550"
+               points="238,265 268,258 278,298 265,332 235,342 210,325 205,295"/>
+      <polygon class="com" data-n="Caves"            data-delay="1150" points="428,208  462,205  462,242  432,260  408,250"/>
+      <polygon class="com" data-n="Fitou"            data-delay="1200" points="460,242  490,240  492,278  462,298  440,285"/>
+      <polygon class="com" data-n="Leucate-sud"      data-delay="1250" points="490,250  518,248  520,285  495,305  468,295"/>
+
+      <!-- ══ BEACON NARBONNE ══ -->
+      <g id="beaconNarbo" filter="url(#glow2)" transform="translate(222, 220)">
+        <circle class="beacon-ring"  cx="0" cy="0" r="5"/>
+        <circle class="beacon-ring beacon-ring2" cx="0" cy="0" r="5"/>
+        <circle class="beacon-dot"   cx="0" cy="0" r="3.5"/>
+        <circle cx="0" cy="0" r="1.2" fill="#FFF8E0" opacity=".9"/>
+      </g>
+
+      <!-- Beacon Port-la-Nouvelle -->
+      <g filter="url(#glowCyan)" transform="translate(240, 318)" style="opacity:0;animation:secPulse 4s 2s infinite ease-in-out">
+        <circle class="beacon-sec" cx="0" cy="0" r="2.8"/>
+        <circle cx="0" cy="0" r="1" fill="#E8F8FF" opacity=".8"/>
+      </g>
+
+      <!-- Beacon Gruissan -->
+      <g filter="url(#glowCyan)" transform="translate(158, 300)" style="opacity:0;animation:secPulse 4s 2.8s infinite ease-in-out">
+        <circle class="beacon-sec" cx="0" cy="0" r="2.2"/>
+        <circle cx="0" cy="0" r="0.8" fill="#E8F8FF" opacity=".7"/>
+      </g>
+
+      <!-- Beacon Leucate -->
+      <g filter="url(#glowCyan)" transform="translate(515, 220)" style="opacity:0;animation:secPulse 4s 3.2s infinite ease-in-out">
+        <circle class="beacon-sec" cx="0" cy="0" r="2"/>
+        <circle cx="0" cy="0" r="0.7" fill="#E8F8FF" opacity=".6"/>
+      </g>
+
+      <!-- ══ LABELS ══ -->
+      <text class="map-txt" x="222" y="228" text-anchor="middle" style="font-size:6px;fill:rgba(212,173,90,.65)">NARBONNE</text>
+      <text class="map-txt" x="240" y="352" text-anchor="middle" style="font-size:5px">PORT-LA-NOUVELLE</text>
+      <text class="map-txt" x="155" y="344" text-anchor="middle" style="font-size:5px">GRUISSAN</text>
+      <text class="map-txt" x="515" y="270" text-anchor="middle" style="font-size:5px">LEUCATE</text>
+
+      <!-- Label territoire -->
+      <text class="map-txt" x="290" y="28" text-anchor="middle"
+            style="font-size:8px;fill:rgba(184,150,62,.22);letter-spacing:.35em">GRAND NARBONNE</text>
+      <text class="map-txt-dim" x="290" y="40" text-anchor="middle"
+            style="letter-spacing:.2em">37 COMMUNES · AUDE · OCCITANIE</text>
+
+      <!-- Coordonnées coins -->
+      <text class="map-txt-coord" x="8" y="672">43°02′N</text>
+      <text class="map-txt-coord" x="8" y="680">2°51′E</text>
+      <text class="map-txt-coord" x="490" y="672">43°28′N</text>
+      <text class="map-txt-coord" x="490" y="680">3°12′E</text>
+
+      <!-- Petite boussole -->
+      <g transform="translate(548, 65)" opacity=".3">
+        <circle cx="0" cy="0" r="10" fill="none" stroke="rgba(184,150,62,.3)" stroke-width=".5"/>
+        <text x="0" y="-14" text-anchor="middle" class="map-txt-coord" style="fill:rgba(184,150,62,.5)">N</text>
+        <line x1="0" y1="-8" x2="0" y2="8" stroke="rgba(184,150,62,.4)" stroke-width=".6"/>
+        <line x1="-8" y1="0" x2="8" y2="0" stroke="rgba(184,150,62,.25)" stroke-width=".4"/>
+        <polygon points="0,-8 2,0 0,-2 -2,0" fill="rgba(212,173,90,.6)"/>
+      </g>
+
+      <!-- Ligne côtière stylisée -->
+      <path d="M115,280 Q130,320 142,328 Q160,340 178,332 Q200,340 210,325 Q225,342 238,342 Q255,348 265,332 Q275,315 278,298"
+            fill="none" stroke="rgba(80,200,232,0.12)" stroke-width="1.5" stroke-dasharray="4 6"/>
+
+      <!-- Mention mer -->
+      <text class="map-txt-coord" x="85" y="370" style="fill:rgba(80,200,232,.18);letter-spacing:.12em">MER MÉDITERRANÉE</text>
+    </svg>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="t-item"><span class="t-sep">◆</span> Grand Narbonne <strong>136 925 hab.</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Chômage <strong>11,0%</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Créations <strong>+759/an</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Chômage 18-24 ans <strong>26% QPV</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Prix immo moyen <strong>~2 250€/m²</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Logements vacants <strong>9,8%</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Port 2030 <strong>200+ emplois</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Solde migratoire <strong>+0,9%/an</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Croissance démographique <strong>+0,7%/an</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Narbonne <strong>57 765 hab.</strong></span>
+    <!-- duplicate -->
+    <span class="t-item"><span class="t-sep">◆</span> Grand Narbonne <strong>136 925 hab.</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Chômage <strong>11,0%</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Créations <strong>+759/an</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Chômage 18-24 ans <strong>26% QPV</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Prix immo moyen <strong>~2 250€/m²</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Logements vacants <strong>9,8%</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Port 2030 <strong>200+ emplois</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Solde migratoire <strong>+0,9%/an</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Croissance démographique <strong>+0,7%/an</strong></span>
+    <span class="t-item"><span class="t-sep">◆</span> Narbonne <strong>57 765 hab.</strong></span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PROBLÈME
+══════════════════════════════════════ -->
+<section class="problem">
+  <div class="problem-grid">
+    <div class="problem-left r">
+      <div class="s-label"><div class="s-label-rule"></div><span class="s-label-text">Constat</span></div>
+      <h2 class="s-title">Les collectivités naviguent <span class="dim">à l'aveugle.</span></h2>
+      <p class="problem-lead">Des décisions à plusieurs dizaines de millions d'euros, prises sur des rapports vieux de trois ans et des tableurs partagés par email. Aucune vision systémique. Aucun temps réel.</p>
+      <blockquote class="problem-quote">
+        « On prend des décisions à 50 M€ sur des intuitions et des données qui datent de l'ancienne mandature. »
+      </blockquote>
+    </div>
+
+    <div class="r d2">
+      <div class="problem-items">
+        <div class="p-item">
+          <div class="p-item-n">01</div>
+          <div>
+            <div class="p-item-title">Des données dispersées dans des silos</div>
+            <div class="p-item-text">Budget, cadastre, social, mobilité — les données existent. Mais personne ne les croise, et personne ne les lit au même moment.</div>
+          </div>
+        </div>
+        <div class="p-item">
+          <div class="p-item-n">02</div>
+          <div>
+            <div class="p-item-title">Des décisions prises à l'intuition</div>
+            <div class="p-item-text">Les rapports commandés aux cabinets arrivent 18 mois après la décision. Les signaux faibles ne remontent jamais assez vite.</div>
+          </div>
+        </div>
+        <div class="p-item">
+          <div class="p-item-n">03</div>
+          <div>
+            <div class="p-item-title">Les grands acteurs privés ont tout</div>
+            <div class="p-item-text">Fonds d'investissement, promoteurs, grandes enseignes — ils analysent votre territoire mieux que vous. TERRITORIO rééquilibre le rapport de force.</div>
+          </div>
+        </div>
+        <div class="p-item">
+          <div class="p-item-n">04</div>
+          <div>
+            <div class="p-item-title">L'IA générique ignore vos enjeux locaux</div>
+            <div class="p-item-text">ChatGPT ne connaît pas vos QPV, vos zones d'activité, vos tensions de service. TERRITORIO est construit sur la réalité de votre territoire.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SOLUTION
+══════════════════════════════════════ -->
+<section class="solution" id="solution">
+  <div class="solution-head r">
+    <div class="s-label" style="justify-content:center"><div class="s-label-rule"></div><span class="s-label-text">La Solution</span></div>
+    <h2 class="s-title" style="text-align:center;margin-top:1rem">Trois couches<br><span class="gold">d'intelligence.</span></h2>
+  </div>
+
+  <div class="layers">
+    <div class="layer l1 r">
+      <div class="layer-n">01</div>
+      <div class="layer-tag">Décision publique</div>
+      <h3 class="layer-title">Cerveau de la Collectivité</h3>
+      <p class="layer-desc">Dashboard exécutif par profil — Président, DGS, Élu délégué, Directeur. Moteur IA conversationnel. Alertes automatiques sur les signaux faibles.</p>
+      <ul class="layer-list">
+        <li>Accès par rôle (RBAC)</li>
+        <li>Questions en langage naturel</li>
+        <li>Alertes temps réel</li>
+        <li>Benchmark inter-territorial</li>
+      </ul>
+    </div>
+    <div class="layer l2 r d2">
+      <div class="layer-n">02</div>
+      <div class="layer-tag">Intelligence B2B</div>
+      <h3 class="layer-title">Moteur Économique</h3>
+      <p class="layer-desc">Base de données vivante — créations d'entreprises, mutations DVF, offres d'emploi. Croisement SIRENE × DVF × INSEE × France Travail en continu.</p>
+      <ul class="layer-list">
+        <li>Signaux faibles économiques</li>
+        <li>Cartographie zones d'activité</li>
+        <li>Licences B2B — CCI / cabinets</li>
+        <li>Rapports automatisés</li>
+      </ul>
+    </div>
+    <div class="layer l3 r d4">
+      <div class="layer-n">03</div>
+      <div class="layer-tag">Simulation IA</div>
+      <h3 class="layer-title">Jumeau Numérique</h3>
+      <p class="layer-desc">Simulez l'impact de vos décisions à 5 ans avant de les prendre — emploi, logement, budget, cohésion sociale. Scénarios comparatifs instantanés.</p>
+      <ul class="layer-list">
+        <li>Simulation politiques publiques</li>
+        <li>Impact emploi / logement / social</li>
+        <li>Scénarios alternatifs</li>
+        <li>Aide à la décision stratégique</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     NUMBERS
+══════════════════════════════════════ -->
+<section class="numbers">
+  <div class="numbers-grid">
+    <div class="n-item r">
+      <div class="n-val" data-count="136925">0</div>
+      <div class="n-label">Habitants<br>Grand Narbonne</div>
+      <div class="n-src">BANATIC · 25/11/2024</div>
+    </div>
+    <div class="n-item r d1">
+      <div class="n-val" data-count="37">0</div>
+      <div class="n-label">Communes<br>membres</div>
+      <div class="n-src">Données officielles</div>
+    </div>
+    <div class="n-item r d2">
+      <div class="n-val" data-count="5569">0</div>
+      <div class="n-label">Entreprises actives<br>SIRENE</div>
+      <div class="n-src">2023</div>
+    </div>
+    <div class="n-item r d3">
+      <div class="n-val" data-suffix="%">11</div>
+      <div class="n-label">Taux de chômage<br>zone d'emploi</div>
+      <div class="n-src">France : 7,2%</div>
+    </div>
+    <div class="n-item r d4">
+      <div class="n-val" data-suffix="+">200</div>
+      <div class="n-label">Emplois<br>Port 2030</div>
+      <div class="n-src">Hub éolien offshore</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     DONNÉES
+══════════════════════════════════════ -->
+<section class="data" id="data">
+  <div class="data-grid">
+    <div class="r">
+      <div class="s-label"><div class="s-label-rule"></div><span class="s-label-text">Sources</span></div>
+      <div class="data-sources" style="margin-top:2rem">
+        <div class="src"><div class="src-name g">INSEE / RP</div><div class="src-desc">Démographie, revenus, ménages, chômage — par commune et par IRIS</div></div>
+        <div class="src"><div class="src-name c">SIRENE</div><div class="src-desc">Toutes les entreprises françaises — créations, radiations, secteurs</div></div>
+        <div class="src"><div class="src-name v">DVF</div><div class="src-desc">Toutes les transactions immobilières depuis 2014, à la parcelle</div></div>
+        <div class="src"><div class="src-name g">France Travail</div><div class="src-desc">Offres d'emploi temps réel, tension par métier et zone</div></div>
+        <div class="src"><div class="src-name c">ADEME / DPE</div><div class="src-desc">Performance énergétique des bâtiments, émissions CO2</div></div>
+        <div class="src"><div class="src-name v">IGN / Cadastre</div><div class="src-desc">Cartographie, parcelles, bâti, foncier — couverture totale</div></div>
+      </div>
+    </div>
+
+    <div class="data-right r d2">
+      <div class="s-label"><div class="s-label-rule"></div><span class="s-label-text">Données</span></div>
+      <h2 class="s-title" style="margin-top:1rem">Sans vos données internes, on a déjà <span class="gold">tout ça.</span></h2>
+      <p class="data-body">Ce prototype tourne uniquement sur des données publiques et gratuites. Zéro accès à vos systèmes. Zéro risque. Zéro engagement. Et c'est déjà suffisant pour identifier vos trois risques majeurs et vos deux opportunités stratégiques les plus urgentes.</p>
+      <div class="data-callout">
+        <div class="data-callout-title">Avec accès à vos données internes →</div>
+        <p>Budget, CAF, services techniques, cadastre, permis de construire. La précision est multipliée par dix. Granularité au quartier. Alertes en temps réel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     PROFILS
+══════════════════════════════════════ -->
+<section class="profiles">
+  <div class="profiles-head r">
+    <div class="s-label"><div class="s-label-rule"></div><span class="s-label-text">Accès par rôle</span></div>
+    <h2 class="s-title">Chaque décideur voit<br>ce dont il a besoin. <span class="dim">Rien de plus.</span></h2>
+  </div>
+
+  <div class="profiles-grid">
+    <a href="dashboard.html" class="profile pr1 r">
+      <div class="profile-icon">🏛️</div>
+      <div class="profile-name">Président / Maire</div>
+      <p class="profile-desc">Risques politiques à 6 mois, opportunités de communication, comparatif territorial. Vision stratégique. Alertes prioritaires.</p>
+      <div class="profile-tags">
+        <span class="ptag">Vue exécutive</span>
+        <span class="ptag">Risques &amp; Alertes</span>
+        <span class="ptag">Comparatif territorial</span>
+      </div>
+      <span class="profile-arrow">Accéder →</span>
+    </a>
+    <a href="dashboard.html" class="profile pr2 r d1">
+      <div class="profile-icon">⚙️</div>
+      <div class="profile-name">DGS</div>
+      <p class="profile-desc">Pilotage opérationnel complet. Tous les indicateurs, tensions de services, synthèse multi-thématique. 4 onglets de données approfondies.</p>
+      <div class="profile-tags">
+        <span class="ptag">Pilotage global</span>
+        <span class="ptag">Économie &amp; Emploi</span>
+        <span class="ptag">Immobilier &amp; Foncier</span>
+      </div>
+      <span class="profile-arrow">Accéder →</span>
+    </a>
+    <a href="dashboard.html" class="profile pr3 r d2">
+      <div class="profile-icon">🗳️</div>
+      <div class="profile-name">Élu Délégué</div>
+      <p class="profile-desc">Périmètre délégué uniquement. Économie, emploi, urbanisme ou action sociale — données fines par commune et par zone.</p>
+      <div class="profile-tags">
+        <span class="ptag">Économie</span>
+        <span class="ptag">Emploi</span>
+        <span class="ptag">Action sociale</span>
+      </div>
+      <span class="profile-arrow">Accéder →</span>
+    </a>
+    <a href="dashboard.html" class="profile pr4 r d3">
+      <div class="profile-icon">📊</div>
+      <div class="profile-name">Directeur de Service</div>
+      <p class="profile-desc">Données métier approfondies. Granularité maximale, tableaux complets, données communes comparées, DVF à la parcelle.</p>
+      <div class="profile-tags">
+        <span class="ptag">Données métier</span>
+        <span class="ptag">DVF</span>
+        <span class="ptag">Rapports</span>
+      </div>
+      <span class="profile-arrow">Accéder →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     POURQUOI MAINTENANT
+══════════════════════════════════════ -->
+<section class="why">
+  <div class="r">
+    <div class="s-label"><div class="s-label-rule"></div><span class="s-label-text">Timing</span></div>
+    <h2 class="s-title" style="margin-top:1rem">La fenêtre est ouverte.<br><span class="dim">Pour trois ans.</span></h2>
+  </div>
+
+  <div class="why-grid">
+    <div class="why-item r">
+      <div class="wi-n">01.</div>
+      <div class="wi-title">Budgets France 2030 disponibles</div>
+      <p class="wi-text">Les collectivités disposent de financements dédiés à la transformation numérique. Ces budgets cherchent des projets concrets, mesurables, déjà opérationnels.</p>
+      <span class="wi-badge">Financement disponible</span>
+    </div>
+    <div class="why-item r d1">
+      <div class="wi-n">02.</div>
+      <div class="wi-title">Effet de réseau décisif</div>
+      <p class="wi-text">Plus on agrège de territoires, plus la base comparative est puissante. Les vingt premiers créent un fossé infranchissable. Chaque mois compte.</p>
+      <span class="wi-badge">Avantage premier entrant</span>
+    </div>
+    <div class="why-item r d2">
+      <div class="wi-n">03.</div>
+      <div class="wi-title">La donnée territoriale, nouveau pétrole</div>
+      <p class="wi-text">Immobilier, énergie, retail, logistique — tous ont besoin d'intelligence territoriale fine. TERRITORIO n'est pas un prestataire. C'est une ressource stratégique.</p>
+      <span class="wi-badge">Valeur stratégique</span>
+    </div>
+    <div class="why-item r d3">
+      <div class="wi-n">04.</div>
+      <div class="wi-title">Souveraineté des données locales</div>
+      <p class="wi-text">Les États vont centraliser les jumeaux numériques territoriaux. Celui qui a déjà la confiance des élus locaux sera incontournable. La bataille commence maintenant.</p>
+      <span class="wi-badge">Souveraineté numérique</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     DÉMO
+══════════════════════════════════════ -->
+<section class="demo" id="demo">
+  <div class="demo-inner">
+    <div class="mockup-wrap r">
+      <div class="mockup">
+        <div class="m-bar">
+          <div class="m-dots">
+            <div class="m-dot"></div><div class="m-dot"></div><div class="m-dot"></div>
+          </div>
+          <div class="m-url">territoriograndnarbonne.netlify.app/dashboard.html</div>
+        </div>
+        <div class="m-body">
+          <div class="m-kpis">
+            <div class="mk"><div class="mk-v">136 925</div><div class="mk-l">HABITANTS</div></div>
+            <div class="mk"><div class="mk-v">11,0%</div><div class="mk-l">CHÔMAGE</div></div>
+            <div class="mk"><div class="mk-v">5 569</div><div class="mk-l">ENTREPRISES</div></div>
+            <div class="mk"><div class="mk-v">26%</div><div class="mk-l">CHÔM. JEUNES</div></div>
+          </div>
+          <div class="m-chart">
+            <div class="mb" style="height:42%;background:rgba(184,150,62,.45)"></div>
+            <div class="mb" style="height:58%;background:rgba(80,200,232,.35)"></div>
+            <div class="mb" style="height:52%;background:rgba(184,150,62,.45)"></div>
+            <div class="mb" style="height:71%;background:rgba(80,200,232,.35)"></div>
+            <div class="mb" style="height:65%;background:rgba(184,150,62,.45)"></div>
+            <div class="mb" style="height:80%;background:rgba(80,200,232,.35)"></div>
+            <div class="mb" style="height:74%;background:rgba(184,150,62,.45)"></div>
+            <div class="mb" style="height:88%;background:rgba(80,200,232,.35)"></div>
+            <div class="mb" style="height:82%;background:rgba(62,232,122,.3)"></div>
+            <div class="mb" style="height:94%;background:rgba(80,200,232,.35)"></div>
+          </div>
+          <div class="m-profiles">
+            <div class="mpr">🏛️ Maire</div>
+            <div class="mpr">⚙️ DGS</div>
+            <div class="mpr">🗳️ Élu</div>
+            <div class="mpr">📊 Dir.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-text r d2">
+      <div class="s-label"><div class="s-label-rule"></div><span class="s-label-text">Démo · En ligne maintenant</span></div>
+      <h2 class="s-title" style="margin-top:1rem">Ce prototype<br>fonctionne. <span class="gold">Aujourd'hui.</span></h2>
+      <p class="demo-body">Construit sur les données publiques du Grand Narbonne. 4 profils d'accès distincts, 15 modules de données, moteur IA conversationnel. Accessible en ligne, maintenant.</p>
+      <div class="demo-feats">
+        <div class="df">4 profils d'accès — Président, DGS, Élu délégué, Directeur</div>
+        <div class="df">15 modules — économie, emploi, démographie, immobilier</div>
+        <div class="df">Moteur IA — posez n'importe quelle question sur le territoire</div>
+        <div class="df">Alertes automatiques sur les signaux faibles</div>
+        <div class="df">Benchmark vs Carcassonne, Béziers, Perpignan, Montpellier</div>
+        <div class="df">100% données vérifiées — BANATIC, INSEE, SIRENE, DVF</div>
+      </div>
+      <a href="dashboard.html" class="btn-primary">Accéder au dashboard →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     CTA
+══════════════════════════════════════ -->
+<section class="cta">
+  <div class="cta-glow"></div>
+  <div class="cta-tag r">⬡ Pilote gratuit · 30 jours · Sans engagement</div>
+  <h2 class="cta-title r d1">
+    <span class="solid">Votre territoire</span>
+    <span class="outline">mérite un</span>
+    <span class="solid"><span class="gold">cockpit.</span></span>
+  </h2>
+  <p class="cta-sub r d2">Un prototype opérationnel sur vos données open data en 30 jours. Pour voir enfin ce que votre territoire vous dit — et ce que vous ne voyez pas encore.</p>
+  <div class="cta-btns r d3">
+    <a href="dashboard.html" class="btn-primary">Voir le dashboard →</a>
+    <a href="#contact" class="btn-text">Demander une démo privée</a>
+  </div>
+  <p class="cta-note r d4">territoriograndnarbonne.netlify.app · Johan Corsaletti</p>
+</section>
+
+<!-- ══════════════════════════════════════
+     CONTACT
+══════════════════════════════════════ -->
+<section class="contact" id="contact">
+  <div class="contact-box r">
+    <div class="s-label" style="margin-bottom:1.5rem"><div class="s-label-rule"></div><span class="s-label-text">Contact</span></div>
+    <h3>Demander une démo privée</h3>
+    <p>Vous représentez une collectivité, une CCI ou un cabinet ? Contactez-nous pour une présentation personnalisée sur votre territoire.</p>
+    <form onsubmit="handleForm(event)">
+      <input type="text" class="f-field" placeholder="Nom — Fonction — Collectivité" id="fn">
+      <input type="email" class="f-field" placeholder="Email professionnel" id="fe">
+      <textarea class="f-field" placeholder="Votre territoire et vos enjeux..." id="fm" rows="3"></textarea>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;border:none;cursor:pointer;font-size:.72rem">Envoyer →</button>
+    </form>
+    <div id="fok">✓ Demande reçue — Réponse sous 24h.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">TERRI<em>TO</em>RIO</div>
+  <ul class="foot-links">
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#data">Données</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="foot-copy">Prototype Couche 1 — Données publiques — © 2025</div>
+</footer>
+
+<script>
+const mobile = window.matchMedia('(max-width:768px)').matches || ('ontouchstart' in window);
+
+/* ── CURSEUR ─────────────────────────── */
+if(!mobile){
+  const cur = document.getElementById('cur');
+  const ring = document.getElementById('cur-ring');
+  let mx=0, my=0, rx=0, ry=0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cur.style.left = mx+'px'; cur.style.top = my+'px';
+  });
+  (function loop(){
+    rx += (mx-rx)*.1; ry += (my-ry)*.1;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(loop);
+  })();
+  document.querySelectorAll('a,button,.p-item,.layer,.profile,.why-item,.n-item,.hero-bar-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cur.style.width='12px'; cur.style.height='12px';
+      ring.style.width='44px'; ring.style.height='44px';
+      ring.style.borderColor='rgba(184,150,62,.5)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cur.style.width='5px'; cur.style.height='5px';
+      ring.style.width='28px'; ring.style.height='28px';
+      ring.style.borderColor='rgba(184,150,62,.35)';
+    });
+  });
+}
+
+
+/* ── ⑤ CURSEUR MORPHANT PAR SECTION ─── */
+if(!mobile) {
+  // Créer le label flottant
+  const curLabel = document.createElement('div');
+  curLabel.id = 'cur-label';
+  document.body.appendChild(curLabel);
+
+  const curEl   = document.getElementById('cur');
+  const ringEl  = document.getElementById('cur-ring');
+
+  // Définition des zones et leurs états
+  const ZONES = [
+    { sel: '.hero',     mode: 'dot',   label: '',         ring: 28 },
+    { sel: '.problem',  mode: 'dot',   label: '',         ring: 28 },
+    { sel: '.solution', mode: 'cross', label: 'EXPLORER', ring: 44 },
+    { sel: '.numbers',  mode: 'dot',   label: '',         ring: 28 },
+    { sel: '.data',     mode: 'dot',   label: '',         ring: 28 },
+    { sel: '.profiles', mode: 'arrow', label: 'ACCÉDER',  ring: 38 },
+    { sel: '.why',      mode: 'dot',   label: '',         ring: 28 },
+    { sel: '.demo',     mode: 'dot',   label: 'DÉMO',     ring: 36 },
+    { sel: '.cta',      mode: 'cta',   label: 'DÉMARRER', ring: 48 },
+    { sel: '.contact',  mode: 'dot',   label: '',         ring: 28 },
+  ];
+
+  let curMode = 'dot';
+
+  function setCursorMode(mode, label, ringSize) {
+    if(mode === curMode) return;
+    curMode = mode;
+
+    // Reset classes
+    curEl.className = '';
+    ringEl.className = '';
+
+    if(mode === 'cross') {
+      curEl.classList.add('cross');
+      ringEl.style.width = ringSize+'px'; ringEl.style.height = ringSize+'px';
+      ringEl.style.borderColor = 'rgba(184,150,62,.45)';
+    } else if(mode === 'arrow') {
+      curEl.classList.add('arrow');
+      curEl.style.width = '10px'; curEl.style.height = '10px';
+      ringEl.style.width = ringSize+'px'; ringEl.style.height = ringSize+'px';
+      ringEl.style.borderColor = 'rgba(184,150,62,.5)';
+    } else if(mode === 'cta') {
+      curEl.classList.add('cta-mode');
+      ringEl.style.width = '0'; ringEl.style.height = '0';
+      ringEl.style.border = 'none';
+    } else {
+      // dot par défaut
+      curEl.style.width = '5px'; curEl.style.height = '5px';
+      curEl.style.borderRadius = '50%';
+      curEl.style.background = 'var(--gold)';
+      ringEl.style.width = ringSize+'px'; ringEl.style.height = ringSize+'px';
+      ringEl.style.border = '1px solid rgba(184,150,62,.35)';
+      ringEl.style.borderRadius = '50%';
+    }
+
+    // Label
+    if(label) {
+      curLabel.textContent = label;
+      curLabel.classList.add('visible');
+    } else {
+      curLabel.classList.remove('visible');
+    }
+  }
+
+  // Détection de la section au mousemove
+  document.addEventListener('mousemove', e => {
+    // Positionner le label
+    curLabel.style.left = e.clientX + 'px';
+    curLabel.style.top  = e.clientY + 'px';
+
+    // Trouver quelle zone est sous le curseur
+    for(const zone of ZONES) {
+      const el = document.querySelector(zone.sel);
+      if(!el) continue;
+      const rect = el.getBoundingClientRect();
+      if(e.clientY >= rect.top && e.clientY <= rect.bottom) {
+        setCursorMode(zone.mode, zone.label, zone.ring);
+        break;
+      }
+    }
+  });
+
+  // Sur les liens/boutons : remplir le cercle CTA
+  document.querySelectorAll('a,button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      if(curMode === 'cta') curEl.classList.add('filled');
+      else {
+        curEl.style.width  = '12px';
+        curEl.style.height = '12px';
+        ringEl.style.borderColor = 'rgba(184,150,62,.6)';
+      }
+    });
+    el.addEventListener('mouseleave', () => {
+      curEl.classList.remove('filled');
+      if(curMode === 'dot') {
+        curEl.style.width  = '5px';
+        curEl.style.height = '5px';
+        ringEl.style.borderColor = 'rgba(184,150,62,.35)';
+      }
+    });
+  });
+}
+
+/* ── PARTICULES SUBTILES ─────────────── */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let W, H, pts = [];
+const N = mobile ? 25 : 70;
+
+function resize(){ W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+window.addEventListener('resize', resize); resize();
+
+class Pt {
+  constructor(){ this.reset(); }
+  reset(){
+    this.x = Math.random()*W; this.y = Math.random()*H;
+    this.vx = (Math.random()-.5)*.18; this.vy = (Math.random()-.5)*.18-.05;
+    this.size = Math.random()*.9+.2; this.life = 0;
+    this.maxL = Math.random()*.55+.3; this.a = 0;
+  }
+  step(){
+    this.x+=this.vx; this.y+=this.vy; this.life+=.004;
+    const h = this.maxL/2;
+    this.a = this.life<h ? this.life/h : 1-(this.life-h)/h;
+    if(this.life>this.maxL||this.y<-5) this.reset();
+  }
+  draw(){
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fillStyle=`rgba(184,150,62,${this.a*.45})`; ctx.fill();
+  }
+}
+for(let i=0;i<N;i++) pts.push(new Pt());
+
+(function loop(){
+  ctx.clearRect(0,0,W,H);
+  if(!mobile){
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);
+      if(d<110){ ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(184,150,62,${(1-d/110)*.04})`; ctx.lineWidth=.4; ctx.stroke(); }
+    }
+  }
+  pts.forEach(p=>{ p.step(); p.draw(); });
+  requestAnimationFrame(loop);
+})();
+
+/* ── NAV SCROLL ─────────────────────── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* ── SCROLL REVEAL ───────────────────── */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('v'); obs.unobserve(e.target); }});
+}, { threshold: .06 });
+document.querySelectorAll('.r').forEach(el => obs.observe(el));
+
+/* ── COMPTEURS EFFET TERMINAL ────────── */
+// Caractères utilisés pour l'effet de scramble
+const CHARS = '0123456789';
+
+function scrambleCount(el) {
+  el.classList.add('scrambling');
+  const target   = parseInt(el.dataset.count);
+  const suf      = el.dataset.suffix || '';
+  const dur      = 2200;           // durée totale
+  const scramDur = dur * 0.55;     // 55% du temps en scramble, 45% en ease final
+  const start    = performance.now();
+
+  // Génère un nombre aléatoire du même nombre de chiffres que target
+  function randNum(digits) {
+    let s = '';
+    for(let i=0;i<digits;i++) s += CHARS[Math.floor(Math.random()*CHARS.length)];
+    return parseInt(s);
+  }
+
+  const digits = String(target).length;
+
+  (function loop(now) {
+    const elapsed = now - start;
+    const p = Math.min(elapsed / dur, 1);
+
+    if (elapsed < scramDur) {
+      // Phase 1 : scramble — chiffres qui s'agitent
+      const scramP = elapsed / scramDur;  // 0→1 pendant la phase scramble
+      // Progressivement on fixe les chiffres de gauche à droite
+      const locked = Math.floor(scramP * digits);
+      const tStr   = String(target).padStart(digits, '0');
+      let display  = '';
+      for(let i = 0; i < digits; i++) {
+        if(i < locked) {
+          display += tStr[i];
+        } else {
+          display += CHARS[Math.floor(Math.random() * CHARS.length)];
+        }
+      }
+      // Formater avec espaces (style fr-FR) si grand nombre
+      const num = parseInt(display);
+      el.textContent = isNaN(num) ? display : num.toLocaleString('fr-FR') + suf;
+    } else {
+      el.classList.remove('scrambling'); // Phase 2 : ease final vers la valeur exacte
+      const p2   = Math.min((elapsed - scramDur) / (dur - scramDur), 1);
+      const ease = 1 - Math.pow(1 - p2, 4);
+      const val  = Math.round(target * ease);
+      el.textContent = val.toLocaleString('fr-FR') + suf;
+    }
+
+    if(p < 1) requestAnimationFrame(loop);
+    else { el.textContent = target.toLocaleString('fr-FR') + suf; el.classList.remove('scrambling'); }
+  })(start);
+}
+
+const cobs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting && e.target.dataset.count){
+      scrambleCount(e.target);
+      cobs.unobserve(e.target);
+    }
+  });
+}, { threshold: .35 });
+document.querySelectorAll('[data-count]').forEach(el => cobs.observe(el));
+
+
+/* ── ④ PARALLAXE ────────────────────── */
+if(!mobile) {
+  const heroMain = document.querySelector('.hero-main');
+  const heroBar  = document.querySelector('.hero-bar');
+  const heroMap  = document.getElementById('heroMap');
+
+  window.addEventListener('scroll', () => {
+    const sy = window.scrollY;
+    // Texte hero remonte plus vite → sentiment de profondeur
+    if(heroMain) heroMain.style.transform = `translateY(${sy * 0.18}px)`;
+    // Bar stats remonte légèrement moins vite
+    if(heroBar)  heroBar.style.transform  = `translateY(${sy * 0.08}px)`;
+    // Carte remonte encore moins vite → plan le plus lointain
+    if(heroMap)  heroMap.style.transform  = `translateY(${sy * 0.04}px)`;
+  }, { passive: true });
+}
+
+
+/* ── ② ALLUMAGE SÉQUENTIEL DES COMMUNES ─ */
+(function lightMap() {
+  const communes = document.querySelectorAll('.com');
+  if(!communes.length) return;
+
+  // Trier par data-delay
+  const sorted = Array.from(communes).sort((a,b) =>
+    parseInt(a.dataset.delay||0) - parseInt(b.dataset.delay||0)
+  );
+
+  // Allumer chaque commune avec son délai + offset global de base 1400ms
+  const BASE = 1400;
+  sorted.forEach(el => {
+    const delay = BASE + parseInt(el.dataset.delay || 0);
+    setTimeout(() => el.classList.add('lit'), delay);
+  });
+
+  // Beacon Narbonne s'allume en premier
+  setTimeout(() => {
+    const b = document.getElementById('beaconNarbo');
+    if(b) b.style.opacity = '1';
+  }, 1800);
+})();
+
+
+/* ── TOOLTIP COMMUNES ────────────────── */
+const COMMUNE_DATA = {
+  "Narbonne":          { pop: 57765, area: "17 332 ha", type: "Ville-centre" },
+  "Gruissan":          { pop: 5087,  area: "4 762 ha",  type: "Littoral" },
+  "Port-la-Nouvelle":  { pop: 5843,  area: "1 580 ha",  type: "Port industriel" },
+  "Coursan":           { pop: 6014,  area: "4 680 ha",  type: "Périurbain" },
+  "Leucate":           { pop: 4380,  area: "3 042 ha",  type: "Littoral" },
+  "Cuxac-d'Aude":      { pop: 4512,  area: "2 890 ha",  type: "Périurbain" },
+  "Sigean":            { pop: 4722,  area: "8 115 ha",  type: "Étangs" },
+  "Bages":             { pop: 1050,  area: "3 125 ha",  type: "Étangs" },
+  "Vinassan":          { pop: 2890,  area: "1 245 ha",  type: "Péri-urbain" },
+  "Armissan":          { pop: 1128,  area: "2 450 ha",  type: "Viticole" },
+  "Fleury":            { pop: 2140,  area: "4 820 ha",  type: "Littoral" },
+  "Moussan":           { pop: 3680,  area: "1 980 ha",  type: "Péri-urbain" },
+  "Marcorignan":       { pop: 1560,  area: "2 340 ha",  type: "Viticole" },
+  "Sainte-Marie-la-Mer":{ pop: 820, area: "1 680 ha",  type: "Littoral" },
+  "Névian":            { pop: 1245,  area: "2 780 ha",  type: "Viticole" },
+  "Montredon":         { pop: 980,   area: "3 250 ha",  type: "Viticole" },
+  "Peyriac-de-Mer":    { pop: 1175,  area: "5 280 ha",  type: "Étangs" },
+  "Canet-d'Aude":      { pop: 2190,  area: "1 890 ha",  type: "Péri-urbain" },
+  "Bizanet":           { pop: 1380,  area: "3 420 ha",  type: "Viticole" },
+  "Ornaisons":         { pop: 1045,  area: "2 890 ha",  type: "Viticole" },
+  "Mailhac":           { pop: 685,   area: "3 125 ha",  type: "Viticole" },
+  "Montséret":         { pop: 398,   area: "2 240 ha",  type: "Viticole" },
+  "Thézan-des-C.":     { pop: 890,   area: "3 680 ha",  type: "Viticole" },
+  "Villesèque":        { pop: 542,   area: "4 120 ha",  type: "Viticole" },
+  "Durban-C.":         { pop: 720,   area: "5 840 ha",  type: "Viticole" },
+  "Roquefort-des-C.":  { pop: 685,   area: "4 380 ha",  type: "Viticole" },
+  "Villeneuve-les-C.": { pop: 628,   area: "5 120 ha",  type: "Viticole" },
+  "Fabrezan":          { pop: 1285,  area: "2 890 ha",  type: "Viticole" },
+  "Ferrals-les-C.":    { pop: 980,   area: "4 560 ha",  type: "Viticole" },
+  "Coustouge":         { pop: 285,   area: "3 210 ha",  type: "Rural" },
+  "Davejean":          { pop: 248,   area: "3 850 ha",  type: "Rural" },
+  "Fitou":             { pop: 980,   area: "4 280 ha",  type: "Viticole" },
+  "La Palme":          { pop: 890,   area: "2 640 ha",  type: "Littoral" },
+  "Caves":             { pop: 485,   area: "3 480 ha",  type: "Viticole" },
+  "Leucate-sud":       { pop: null,  area: null,         type: null },
+  "Saint-Marcel":      { pop: 1840,  area: "2 180 ha",  type: "Péri-urbain" },
+  "Salles-d'Aude":     { pop: 2140,  area: "3 560 ha",  type: "Viticole" },
+};
+
+// Créer le DOM du tooltip
+const ttEl = document.createElement('div');
+ttEl.id = 'map-tooltip';
+document.body.appendChild(ttEl);
+
+function showTooltip(e, name) {
+  const d = COMMUNE_DATA[name];
+  if(!d || !d.pop) return;
+
+  ttEl.innerHTML = `
+    <div class="tt-name">${name}</div>
+    <div class="tt-row"><span>POPULATION</span><span class="tt-val">${d.pop.toLocaleString('fr-FR')} hab.</span></div>
+    <div class="tt-row"><span>SUPERFICIE</span><span class="tt-val">${d.area}</span></div>
+    <div class="tt-row"><span>PROFIL</span><span class="tt-val">${d.type}</span></div>
+    <div class="tt-source">INSEE RP 2020</div>
+  `;
+
+  // Positionner — décalé par rapport au curseur
+  const margin = 18;
+  let x = e.clientX + margin;
+  let y = e.clientY - 10;
+
+  // Éviter de sortir de l'écran
+  if(x + 180 > window.innerWidth)  x = e.clientX - 180 - margin;
+  if(y + 120 > window.innerHeight) y = e.clientY - 120;
+
+  ttEl.style.left = x + 'px';
+  ttEl.style.top  = y + 'px';
+  ttEl.classList.add('show');
+}
+
+function hideTooltip() {
+  ttEl.classList.remove('show');
+}
+
+function moveTooltip(e) {
+  const margin = 18;
+  let x = e.clientX + margin;
+  let y = e.clientY - 10;
+  if(x + 180 > window.innerWidth)  x = e.clientX - 180 - margin;
+  if(y + 120 > window.innerHeight) y = e.clientY - 120;
+  ttEl.style.left = x + 'px';
+  ttEl.style.top  = y + 'px';
+}
+
+// Activer hover sur les communes (pointer-events uniquement dans la carte)
+// On active les communes après le chargement
+window.addEventListener('load', () => {
+  document.querySelectorAll('.com').forEach(el => {
+    const name = el.dataset.n;
+    if(!name) return;
+
+    el.style.pointerEvents = 'all';
+    el.style.cursor = 'crosshair';
+
+    el.addEventListener('mouseenter', e => {
+      // Highlight de la commune
+      el.style.fill = 'rgba(184,150,62,0.16)';
+      el.style.stroke = 'rgba(237,212,133,0.8)';
+      el.style.filter = 'drop-shadow(0 0 4px rgba(184,150,62,0.35))';
+      showTooltip(e, name);
+    });
+    el.addEventListener('mousemove',  moveTooltip);
+    el.addEventListener('mouseleave', () => {
+      // Revenir à l'état lit ou base
+      el.style.fill   = '';
+      el.style.stroke = '';
+      el.style.filter = '';
+      hideTooltip();
+    });
+  });
+  // La carte est décorative dans le hero → on désactive le pointer-events sur le conteneur
+  // MAIS on active les communes individuellement via JS
+  const heroMap = document.getElementById('heroMap');
+  if(heroMap) heroMap.style.pointerEvents = 'none';
+  // Re-activer directement sur le SVG
+  const mapSvg = document.getElementById('mapSvg');
+  if(mapSvg) mapSvg.style.pointerEvents = 'all';
+});
+
+/* ── FORMULAIRE ─────────────────────── */
+function handleForm(e){
+  e.preventDefault();
+  if(!document.getElementById('fn').value||!document.getElementById('fe').value) return;
+  document.getElementById('fok').style.display = 'block';
+  e.target.style.opacity = '.3'; e.target.style.pointerEvents = 'none';
+}
+</script>
+</body>
+</html>
