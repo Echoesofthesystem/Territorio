@@ -4,21 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TERRITORIO — Grand Narbonne</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Outfit:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <style>
-    :root{--bg:#07090E;--surface:#0C0F18;--surface2:#111520;--border:#1A2030;--border2:#222840;--or:#C9A84C;--or2:#E8C96A;--cyan:#00C8F0;--vert:#00E87A;--rouge:#FF3D50;--violet:#A78BFA;--blanc:#E8EEF8;--gris:#4A5870;--gris2:#7A90A8}
+    :root{--bg:#08090C;--surface:#0D0F15;--surface2:#12151E;--border:rgba(184,150,62,0.1);--border2:rgba(184,150,62,0.06);--or:#B8963E;--or2:#D4AD5A;--or3:#EDD485;--cyan:#4AB8D4;--vert:#3DC87A;--rouge:#C45068;--violet:#8A7ABF;--blanc:#EEF2F8;--gris:#38485A;--gris2:#68788C;--gris3:#4A5870}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--blanc);min-height:100vh;overflow-x:hidden}
+    body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--blanc);min-height:100vh;overflow-x:hidden}
     #login{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
     .glow{position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
-    .login-logo{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:0.2em;margin-bottom:0.3rem;position:relative;z-index:1}
+    .login-logo{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;letter-spacing:0.2em;margin-bottom:0.3rem;position:relative;z-index:1}
     .login-logo span{color:var(--or)}
     .login-sub{font-size:0.78rem;color:var(--gris2);letter-spacing:0.12em;margin-bottom:0.4rem;font-family:'JetBrains Mono',monospace;position:relative;z-index:1}
     .live-pill{display:flex;align-items:center;gap:0.4rem;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);padding:0.25rem 1rem;margin-bottom:2.5rem;font-size:0.68rem;color:var(--or);font-family:'JetBrains Mono',monospace;position:relative;z-index:1}
     .dot{width:5px;height:5px;background:var(--vert);border-radius:50%;box-shadow:0 0 6px var(--vert);animation:blink 2s ease infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-    .login-heading{font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;color:var(--gris2);letter-spacing:0.12em;margin-bottom:1.4rem;text-transform:uppercase;position:relative;z-index:1}
+    .login-heading{font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:400;color:var(--gris2);letter-spacing:0.12em;margin-bottom:1.4rem;text-transform:uppercase;position:relative;z-index:1}
     .roles{display:grid;grid-template-columns:repeat(2,1fr);gap:0.9rem;max-width:800px;width:100%;position:relative;z-index:1}
     .rc{background:var(--surface);border:1px solid var(--border2);padding:1.6rem;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden}
     .rc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;transform:scaleX(0);transition:transform 0.3s}
@@ -28,7 +30,7 @@
     .rc.r2:hover{border-color:rgba(0,200,240,0.35);box-shadow:0 8px 28px rgba(0,200,240,0.1)}
     .rc.r3:hover{border-color:rgba(0,232,122,0.35);box-shadow:0 8px 28px rgba(0,232,122,0.1)}
     .rc.r4:hover{border-color:rgba(167,139,250,0.35);box-shadow:0 8px 28px rgba(167,139,250,0.1)}
-    .rc-icon{font-size:1.9rem;margin-bottom:0.7rem}.rc-name{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:0.25rem}
+    .rc-icon{font-size:1.5rem;margin-bottom:0.5rem}.rc-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;margin-bottom:0.25rem}
     .rc.r1 .rc-name{color:var(--or)}.rc.r2 .rc-name{color:var(--cyan)}.rc.r3 .rc-name{color:var(--vert)}.rc.r4 .rc-name{color:var(--violet)}
     .rc-desc{font-size:0.78rem;color:var(--gris2);line-height:1.5;margin-bottom:0.9rem}
     .rc-tags{display:flex;flex-wrap:wrap;gap:0.3rem}
@@ -38,7 +40,7 @@
     #app.on{display:flex}
     .topbar{display:flex;justify-content:space-between;align-items:center;padding:0 1.4rem;height:48px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;flex-shrink:0}
     .tl{display:flex;align-items:center;gap:0.8rem}
-    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:0.92rem;letter-spacing:0.18em}
+    .logo{font-family:'Outfit',sans-serif;font-weight:500;font-size:0.82rem;letter-spacing:0.22em}
     .logo span{color:var(--or)}
     .tpill{display:flex;align-items:center;gap:0.35rem;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.18);padding:0.18rem 0.65rem;font-size:0.62rem;color:var(--or);font-family:'JetBrains Mono',monospace}
     .rpill{padding:0.18rem 0.65rem;border:1px solid;font-size:0.62rem;font-family:'JetBrains Mono',monospace}
@@ -73,7 +75,7 @@
     .kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
     .kpi.or::after{background:var(--or)}.kpi.cy::after{background:var(--cyan)}.kpi.ve::after{background:var(--vert)}.kpi.ro::after{background:var(--rouge)}.kpi.vi::after{background:var(--violet)}
     .kl{font-size:0.58rem;letter-spacing:0.12em;color:var(--gris);text-transform:uppercase;margin-bottom:0.55rem;font-family:'JetBrains Mono',monospace}
-    .kv{font-family:'Syne',sans-serif;font-size:1.65rem;font-weight:800;line-height:1;margin-bottom:0.35rem}
+    .kv{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;line-height:1;margin-bottom:0.35rem;letter-spacing:-.01em}
     .kpi.or .kv{color:var(--or)}.kpi.cy .kv{color:var(--cyan)}.kpi.ve .kv{color:var(--vert)}.kpi.ro .kv{color:var(--rouge)}.kpi.vi .kv{color:var(--violet)}
     .kd{font-size:0.65rem;color:var(--gris2);display:flex;gap:0.3rem}
     .up{color:var(--vert)}.dn{color:var(--rouge)}
@@ -111,6 +113,68 @@
     .abanner.ro{border-color:rgba(255,61,80,0.3);background:rgba(255,61,80,0.06);color:var(--rouge)}
     .abanner.or{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06);color:var(--or)}
     .abanner.ve{border-color:rgba(0,232,122,0.3);background:rgba(0,232,122,0.06);color:var(--vert)}
+
+    /* ── CARTE LEAFLET DASHBOARD ─────────── */
+    #leaflet-map {
+      width: 100%; height: 420px;
+      border-radius: 6px;
+      background: #07090E;
+    }
+    .leaflet-container {
+      background: #07090E !important;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .leaflet-control-zoom a {
+      background: #0B0E18 !important;
+      color: #C9A84C !important;
+      border-color: #1C2436 !important;
+    }
+    .leaflet-control-zoom a:hover {
+      background: #161C28 !important;
+    }
+    .leaflet-control-attribution {
+      background: rgba(7,9,14,0.7) !important;
+      color: #3A4A5C !important;
+      font-size: 9px !important;
+    }
+    .leaflet-popup-content-wrapper {
+      background: #0B0E18;
+      border: 1px solid #1C2436;
+      border-radius: 4px;
+      color: #D8E0EC;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .leaflet-popup-tip { background: #0B0E18; }
+    .leaflet-popup-content { margin: 12px 16px; font-size: 13px; line-height: 1.6; }
+    .lf-popup-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: #C9A84C; margin-bottom: 6px;
+    }
+    .lf-popup-row {
+      display: flex; justify-content: space-between;
+      gap: 16px; font-size: 0.7rem;
+      color: #5A6E82; border-bottom: 1px solid #161C28;
+      padding: 4px 0;
+    }
+    .lf-popup-row:last-child { border: none; }
+    .lf-popup-val { color: #D8E0EC; font-family: 'JetBrains Mono', monospace; }
+    .lf-popup-note {
+      font-size: .65rem; color: #5A6E82;
+      margin-top: 8px; line-height: 1.5;
+      padding-top: 8px; border-top: 1px solid #161C28;
+    }
+    .lf-legend {
+      position: absolute; bottom: 12px; left: 12px;
+      z-index: 1000; background: rgba(11,14,24,0.92);
+      border: 1px solid #1C2436; border-radius: 4px;
+      padding: 8px 12px; font-size: .6rem;
+      color: #5A6E82; letter-spacing: .08em;
+    }
+    .lf-legend-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .lf-legend-row:last-child { margin: 0; }
+    .lf-dot { width: 8px; height: 8px; border-radius: 2px; }
+
     @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     .panel.on .kpi,.panel.on .card{animation:fu 0.35s ease both}
     .panel.on .kpi:nth-child(1){animation-delay:.05s}.panel.on .kpi:nth-child(2){animation-delay:.1s}.panel.on .kpi:nth-child(3){animation-delay:.15s}.panel.on .kpi:nth-child(4){animation-delay:.2s}.panel.on .kpi:nth-child(5){animation-delay:.25s}
@@ -279,6 +343,58 @@
     @media(max-width:900px) {
       .map-container { grid-template-columns: 1fr; }
     }
+
+    /* ── MODULE CARTE LEAFLET ────────────── */
+    #leaflet-map {
+      height: 440px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(184,150,62,.12);
+      background: #08090C;
+    }
+    /* Override Leaflet pour thème sombre */
+    .leaflet-container {
+      background: #08090C !important;
+      font-family: 'JetBrains Mono', monospace !important;
+    }
+    .leaflet-tile { filter: brightness(0.15) sepia(0.4) hue-rotate(10deg); }
+    .leaflet-control-zoom a {
+      background: #0D0F15 !important;
+      color: rgba(184,150,62,.8) !important;
+      border: 1px solid rgba(184,150,62,.2) !important;
+    }
+    .leaflet-control-zoom a:hover {
+      background: rgba(184,150,62,.1) !important;
+      color: #D4AD5A !important;
+    }
+    .leaflet-control-attribution {
+      background: rgba(8,9,12,.8) !important;
+      color: rgba(184,150,62,.25) !important;
+      font-size: 9px !important;
+    }
+    /* Tooltip Leaflet custom */
+    .leaflet-tooltip {
+      background: rgba(8,9,12,.95) !important;
+      border: 1px solid rgba(184,150,62,.3) !important;
+      border-left: 2px solid #B8963E !important;
+      color: #EEF2F8 !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 11px !important;
+      border-radius: 0 !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,.5) !important;
+      padding: 8px 12px !important;
+    }
+    .tt-commune-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; font-weight: 400;
+      color: #D4AD5A; display: block;
+      margin-bottom: 4px;
+    }
+    .tt-commune-data {
+      font-size: 10px; color: #68788C;
+      line-height: 1.6;
+    }
+    .tt-commune-data span { color: #EEF2F8; }
   </style>
 </head>
 <body>
@@ -338,7 +454,7 @@ const CONTENT = {
 maire: [
 
 // Onglet 0 — Vue exécutive
-`<div class="abanner ro">⚠️ <strong>Alerte exécutive :</strong> Chômage 18-24 ans à 26% sur les QPV de Narbonne — risque politique à traiter avant l'été 2025</div>
+`<div class="abanner ro" style="font-size:.65rem;font-weight:300;padding:.6rem 1rem;letter-spacing:.06em">⚠️ <strong>Alerte exécutive :</strong> Chômage 18-24 ans à 26% sur les QPV de Narbonne — risque politique à traiter avant l'été 2025</div>
 <div class="krow k4">
   <div class="kpi or"><div class="kl">Croissance démographique</div><div class="kv">+0,7%</div><div class="kd"><span class="up">↑ Aude : +0,4%</span></div></div>
   <div class="kpi ro"><div class="kl">Chômage zone d'emploi</div><div class="kv">11,0%</div><div class="kd"><span class="dn">France : 7,2%</span></div></div>
@@ -374,13 +490,13 @@ maire: [
   </div>
 </div>
 <div class="g3">
-  <div class="card"><div class="ct">Population <span class="b bor">INSEE/BANATIC 2024</span></div><div style="font-family:'Syne',sans-serif;font-size:2.3rem;font-weight:800;color:var(--or);margin-bottom:0.2rem">136 925</div><div style="font-size:0.72rem;color:var(--gris2);margin-bottom:0.7rem">habitants officiels · 37 communes · 846,6 km²</div><canvas id="c_m1" style="max-height:110px"></canvas></div>
-  <div class="card"><div class="ct">Dynamique économique <span class="b bcy">SIRENE</span></div><div style="font-family:'Syne',sans-serif;font-size:2.3rem;font-weight:800;color:var(--cyan);margin-bottom:0.2rem">759</div><div style="font-size:0.72rem;color:var(--gris2);margin-bottom:0.7rem">créations entreprises/an · 5 569 actives</div><canvas id="c_m2" style="max-height:110px"></canvas></div>
+  <div class="card"><div class="ct">Population <span class="b bor">INSEE/BANATIC 2024</span></div><div style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:300;font-family:'Cormorant Garamond',serif;color:var(--or2);margin-bottom:0.2rem">136 925</div><div style="font-size:0.72rem;color:var(--gris2);margin-bottom:0.7rem">habitants officiels · 37 communes · 846,6 km²</div><canvas id="c_m1" style="max-height:110px"></canvas></div>
+  <div class="card"><div class="ct">Dynamique économique <span class="b bcy">SIRENE</span></div><div style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:300;font-family:'Cormorant Garamond',serif;color:var(--cyan);margin-bottom:0.2rem">759</div><div style="font-size:0.72rem;color:var(--gris2);margin-bottom:0.7rem">créations entreprises/an · 5 569 actives</div><canvas id="c_m2" style="max-height:110px"></canvas></div>
   <div class="card"><div class="ct">Comparatif chômage territorial <span class="b bve">ANALYSE</span></div><canvas id="c_m3" style="max-height:155px"></canvas></div>
 </div>`,
 
 // Onglet 1 — Risques & Alertes
-`<div class="abanner ro">⚠️ <strong>3 risques politiques actifs</strong> — Chômage jeunes, logement, commerce. Niveau d'attention : ÉLEVÉ</div>
+`<div class="abanner ro" style="font-size:.65rem;font-weight:300;padding:.6rem 1rem;letter-spacing:.06em">⚠️ <strong>3 risques politiques actifs</strong> — Chômage jeunes, logement, commerce. Niveau d'attention : ÉLEVÉ</div>
 <div class="krow k4">
   <div class="kpi ro"><div class="kl">Chômage 18-24 ans</div><div class="kv">26%</div><div class="kd"><span class="dn">QPV Narbonne · Critique</span></div></div>
   <div class="kpi ro"><div class="kl">Hausse prix immo 2 ans</div><div class="kv">+12%</div><div class="kd"><span class="dn">Exclusion primo-accédants</span></div></div>
@@ -429,7 +545,7 @@ maire: [
 </div>`,
 
 // Onglet 2 — Comparatif territorial
-`<div class="abanner or">📊 <strong>Comparatif basé sur données publiques</strong> — INSEE · BIT · SIRENE · BANATIC 2022-2024</div>
+`<div class="abanner or" style="font-size:.65rem;font-weight:300;padding:.6rem 1rem;letter-spacing:.06em">📊 <strong>Comparatif basé sur données publiques</strong> — INSEE · BIT · SIRENE · BANATIC 2022-2024</div>
 <div class="krow k4">
   <div class="kpi or"><div class="kl">Population Grand Narbonne</div><div class="kv">136 925</div><div class="kd"><span class="up">Rang 3 / Aude</span></div></div>
   <div class="kpi cy"><div class="kl">Rang croissance démo.</div><div class="kv">#1</div><div class="kd"><span class="up">Agglos audoises</span></div></div>
@@ -887,87 +1003,15 @@ directeur: [
 `<div class="map-module">
   <div class="map-module-title">
     <span style="color:var(--or)">⬡</span>
-    Carte interactive — 37 communes du Grand Narbonne
-    <span class="b bvi" style="margin-left:auto">INSEE · BANATIC · DVF 2024</span>
+    Carte interactive — 37 communes · Grand Narbonne
+    <span class="b bvi" style="margin-left:auto">GÉOGRAPHIE OFFICIELLE · DONNÉES INSEE 2024</span>
   </div>
-  <div class="map-container">
-    <!-- SVG Carte -->
-    <div class="map-svg-wrap">
-      <svg viewBox="0 0 580 480" id="dashMap" xmlns="http://www.w3.org/2000/svg">
-        <!-- Grille -->
-        <line class="dmap-ret" x1="0" y1="120" x2="580" y2="120"/>
-        <line class="dmap-ret" x1="0" y1="240" x2="580" y2="240"/>
-        <line class="dmap-ret" x1="0" y1="360" x2="580" y2="360"/>
-        <line class="dmap-ret" x1="145" y1="0" x2="145" y2="480"/>
-        <line class="dmap-ret" x1="290" y1="0" x2="290" y2="480"/>
-        <line class="dmap-ret" x1="435" y1="0" x2="435" y2="480"/>
+  <div id="leaflet-map"></div>
+</div>
 
-        <!-- ═══ 37 COMMUNES ═══ -->
-        <polygon class="dcom" data-id="mailhac"      data-n="Mailhac"           points="58,55  108,45  118,72  95,90  60,84"/>
-        <polygon class="dcom" data-id="ornaisons"    data-n="Ornaisons"         points="108,45  162,38  172,65  148,88  118,82"/>
-        <polygon class="dcom" data-id="bizanet"      data-n="Bizanet"           points="162,38  212,33  220,60  198,84  172,80"/>
-        <polygon class="dcom" data-id="montseret"    data-n="Montséret"         points="212,33  262,28  270,56  248,80  222,76"/>
-        <polygon class="dcom" data-id="thezan"       data-n="Thézan-des-C."    points="262,28  315,25  322,52  300,76  272,72"/>
-        <polygon class="dcom" data-id="villeseque"   data-n="Villesèque-des-C." points="315,25  368,23  374,50  350,74  322,70"/>
-        <polygon class="dcom" data-id="durban"       data-n="Durban-Corbières"  points="368,23  420,21  428,48  405,72  374,68"/>
-        <polygon class="dcom" data-id="roquefort"    data-n="Roquefort-des-C."  points="420,21  472,19  478,46  458,70  428,66"/>
-        <polygon class="dcom" data-id="villeneuve"   data-n="Villeneuve-les-C." points="472,19  524,21  528,48  506,72  478,68"/>
-
-        <polygon class="dcom" data-id="canet"        data-n="Canet-d'Aude"     points="58,84   95,90  100,124  72,140  45,128"/>
-        <polygon class="dcom" data-id="moussan"      data-n="Moussan"           points="95,90  148,88  152,120  122,140  100,132"/>
-        <polygon class="dcom" data-id="nevian"       data-n="Névian"            points="148,88  198,84  202,116  172,140  152,128"/>
-        <polygon class="dcom" data-id="marcorignan"  data-n="Marcorignan"       points="198,84  248,80  252,112  222,136  202,128"/>
-        <polygon class="dcom" data-id="montredon"    data-n="Montredon"         points="248,80  300,76  304,108  274,132  252,126"/>
-        <polygon class="dcom" data-id="fabrezan"     data-n="Fabrezan"          points="300,76  350,74  354,106  324,130  304,124"/>
-        <polygon class="dcom" data-id="ferrals"      data-n="Ferrals-les-C."   points="350,74  405,72  408,104  378,128  354,122"/>
-        <polygon class="dcom" data-id="coustouge"    data-n="Coustouge"         points="405,72  458,70  460,102  432,126  408,120"/>
-        <polygon class="dcom" data-id="davejean"     data-n="Davejean"          points="458,70  524,72  525,104  495,128  460,120"/>
-
-        <polygon class="dcom" data-id="vinassan"     data-n="Vinassan"          points="45,128  72,140  68,174  40,184  22,165"/>
-        <polygon class="dcom" data-id="coursan"      data-n="Coursan"           points="72,140  122,140  120,174  88,190  68,180"/>
-        <polygon class="dcom" data-id="cuxac"        data-n="Cuxac-d'Aude"     points="122,140  172,140  170,174  138,190  120,180"/>
-        <polygon class="dcom" data-id="salles"       data-n="Salles-d'Aude"    points="172,140  222,136  220,170  188,188  170,180"/>
-
-        <polygon class="dcom dcom-main" data-id="narbonne" data-n="Narbonne"   points="222,136 274,132 278,168 268,208 238,230 200,232 170,215 165,178 188,162"/>
-
-        <polygon class="dcom" data-id="armissan"     data-n="Armissan"          points="274,132  324,130  322,164  292,182  278,174"/>
-        <polygon class="dcom" data-id="bages"        data-n="Bages"             points="324,130  378,128  375,162  345,180  322,176"/>
-        <polygon class="dcom" data-id="peyriac"      data-n="Peyriac-de-Mer"   points="378,128  432,126  428,160  398,178  375,174"/>
-        <polygon class="dcom" data-id="sigean"       data-n="Sigean"            points="432,126  495,128  490,163  460,182  428,176"/>
-
-        <polygon class="dcom" data-id="fleury"       data-n="Fleury"            points="40,184  68,180  65,218  38,232  18,215"/>
-        <polygon class="dcom" data-id="saintmarcel"  data-n="Saint-Marcel"      points="68,180  120,180  118,216  85,232  65,222"/>
-        <polygon class="dcom" data-id="stemariemerh" data-n="Ste-Marie-la-Mer" points="120,180  170,180  168,218  135,234  118,222"/>
-
-        <polygon class="dcom dcom-coast" data-id="gruissan" data-n="Gruissan"  points="135,234 170,228 200,232 205,272 178,295 142,290 120,268 115,248"/>
-        <polygon class="dcom dcom-coast" data-id="portlanouvelle" data-n="Port-la-Nouvelle" points="238,230 268,224 278,262 265,294 235,302 210,288 205,260"/>
-
-        <polygon class="dcom" data-id="leucate"      data-n="Leucate"           points="490,163  545,166  548,204  518,222  490,215"/>
-        <polygon class="dcom" data-id="lapalme"      data-n="La Palme"          points="460,182  490,178  492,218  462,236  438,226"/>
-        <polygon class="dcom" data-id="caves"        data-n="Caves"             points="428,176  462,173  462,210  432,228  408,218"/>
-        <polygon class="dcom" data-id="fitou"        data-n="Fitou"             points="460,210  490,208  492,244  462,262  440,250"/>
-
-        <!-- Beacon Narbonne -->
-        <circle cx="222" cy="190" r="3" fill="#D4AD5A" opacity=".9"
-                style="filter:drop-shadow(0 0 4px rgba(212,173,90,.8))"/>
-        <circle cx="222" cy="190" r="1" fill="#FFF8E0"/>
-
-        <!-- Labels -->
-        <text class="dmap-txt" x="222" y="198" text-anchor="middle" style="font-size:5.5px;fill:rgba(212,173,90,.6)">NARBONNE</text>
-        <text class="dmap-txt" x="290" y="16" text-anchor="middle" style="fill:rgba(201,168,76,.18);letter-spacing:.3em">GRAND NARBONNE · 37 COMMUNES</text>
-      </svg>
-    </div>
-
-    <!-- Panneau données -->
-    <div class="com-panel" id="comPanel">
-      <div class="com-placeholder">
-        <div class="com-placeholder-icon">⬡</div>
-        <div>Cliquez sur une commune<br>pour afficher ses données</div>
-      </div>
-    </div>
   </div>
 </div>
-<div class="abanner ve">📊 <strong>Données consolidées par commune</strong> — Sources : INSEE RP 2022 · BANATIC 2024 · DVF 2024 · SIRENE</div>
+<div class="abanner ve" style="font-size:.65rem;font-weight:300;padding:.6rem 1rem;letter-spacing:.06em">📊 <strong>Données consolidées par commune</strong> — Sources : INSEE RP 2022 · BANATIC 2024 · DVF 2024 · SIRENE</div>
 <div class="krow k4">
   <div class="kpi vi"><div class="kl">Communes membres</div><div class="kv">37</div><div class="kd"><span>846,6 km²</span></div></div>
   <div class="kpi or"><div class="kl">Commune principale</div><div class="kv">57 765</div><div class="kd"><span>Narbonne — 42%</span></div></div>
@@ -1137,6 +1181,7 @@ function enter(r){
 function renderTab(idx){
   const html=CONTENT[role][idx]||'<div class="card"><div class="ct">Données à venir</div><p style="color:var(--gris2);font-size:0.8rem">Ce module sera alimenté par les données internes de la collectivité.</p></div>';
   document.getElementById('main').innerHTML=`<div class="panel on">${html}</div>`;
+  setTimeout(()=>{ if(document.getElementById('leaflet-map')) initLeafletMap(); },50);
 }
 
 function switchTab(btn){
@@ -1175,6 +1220,167 @@ function runIA(){
 document.getElementById('iain').addEventListener('keypress',e=>{if(e.key==='Enter')runIA();});
 function tick(){document.getElementById('clk').textContent=new Date().toLocaleTimeString('fr-FR');}
 setInterval(tick,1000);tick();
+
+
+const GN_GEOJSON = {
+  "type": "FeatureCollection",
+  "features": [
+    {"type":"Feature","properties":{"id":"narbonne","n":"Narbonne","pop":57765,"area":"17 332 ha","immo":"2 450€/m²","chom":"10.8%","type":"Ville-centre","tags":[["Port 2030","cy"],["QPV","ro"],["Pôle emploi","or"]],"note":"Chef-lieu d'arrondissement. Moteur économique du territoire. Chômage QPV à 26% chez les 18-24 ans."},"geometry":{"type":"Polygon","coordinates":[[[2.95,43.18],[3.05,43.18],[3.08,43.12],[3.05,43.08],[2.95,43.08],[2.90,43.12],[2.95,43.18]]]}},
+    {"type":"Feature","properties":{"id":"gruissan","n":"Gruissan","pop":5087,"area":"4 762 ha","immo":"3 200€/m²","chom":"8.2%","type":"Littoral","tags":[["Tourisme","cy"],["Station class.","or"]],"note":"Station balnéaire classée. Fort attrait touristique, résidences secondaires dominantes (60%)."},"geometry":{"type":"Polygon","coordinates":[[[3.05,43.10],[3.15,43.10],[3.18,43.04],[3.12,43.00],[3.05,43.02],[3.02,43.06],[3.05,43.10]]]}},
+    {"type":"Feature","properties":{"id":"portlanouvelle","n":"Port-la-Nouvelle","pop":5843,"area":"1 580 ha","immo":"1 950€/m²","chom":"12.1%","type":"Port industriel","tags":[["Éolien offshore","cy"],["Port 2030","or"],["Industrie","ro"]],"note":"Hub stratégique éolien offshore. 200+ emplois attendus d'ici 2030. Reconversion industrielle en cours."},"geometry":{"type":"Polygon","coordinates":[[[3.02,43.02],[3.10,43.02],[3.10,42.96],[3.04,42.94],[2.99,42.97],[3.02,43.02]]]}},
+    {"type":"Feature","properties":{"id":"coursan","n":"Coursan","pop":6014,"area":"4 680 ha","immo":"1 750€/m²","chom":"9.8%","type":"Périurbain","tags":[["Croissance","ve"],["Résidentiel","or"]],"note":"2ème commune en population. Dynamique résidentielle forte, attractivité familiale."},"geometry":{"type":"Polygon","coordinates":[[[2.85,43.24],[2.97,43.24],[2.97,43.18],[2.88,43.17],[2.83,43.20],[2.85,43.24]]]}},
+    {"type":"Feature","properties":{"id":"cuxac","n":"Cuxac-d'Aude","pop":4512,"area":"2 890 ha","immo":"1 680€/m²","chom":"9.2%","type":"Périurbain","tags":[["Résidentiel","or"],["Viticole","ve"]],"note":"Zone périurbaine de Narbonne. Mixité résidentielle et viticole."},"geometry":{"type":"Polygon","coordinates":[[[2.78,43.24],[2.87,43.24],[2.87,43.18],[2.80,43.17],[2.76,43.20],[2.78,43.24]]]}},
+    {"type":"Feature","properties":{"id":"salles","n":"Salles-d'Aude","pop":2140,"area":"3 560 ha","immo":"1 660€/m²","chom":"9.3%","type":"Viticole","tags":[["Viticulture","ve"],["Résidentiel","or"]],"note":"Commune viticole et résidentielle. Cave coopérative active."},"geometry":{"type":"Polygon","coordinates":[[[2.97,43.28],[3.07,43.28],[3.07,43.22],[2.99,43.21],[2.95,43.24],[2.97,43.28]]]}},
+    {"type":"Feature","properties":{"id":"sigean","n":"Sigean","pop":4722,"area":"8 115 ha","immo":"1 820€/m²","chom":"10.2%","type":"Étangs","tags":[["Réserve africaine","cy"],["Étangs","or"]],"note":"Commune des étangs. Zoo safari et réserve africaine = atout touristique majeur."},"geometry":{"type":"Polygon","coordinates":[[[2.96,43.06],[3.05,43.06],[3.06,43.00],[2.99,42.97],[2.92,42.99],[2.93,43.04],[2.96,43.06]]]}},
+    {"type":"Feature","properties":{"id":"leucate","n":"Leucate","pop":4380,"area":"3 042 ha","immo":"2 900€/m²","chom":"7.5%","type":"Littoral","tags":[["Tourisme","cy"],["Étang","or"]],"note":"Commune littorale avec étang de Leucate. Fort tourisme estival, économie saisonnière."},"geometry":{"type":"Polygon","coordinates":[[[2.98,42.96],[3.07,42.96],[3.07,42.90],[3.00,42.88],[2.95,42.91],[2.98,42.96]]]}},
+    {"type":"Feature","properties":{"id":"fitou","n":"Fitou","pop":980,"area":"4 280 ha","immo":"1 680€/m²","chom":"8.4%","type":"Viticole","tags":[["AOC Fitou","or"],["Prestige","cy"]],"note":"AOC Fitou mondialement reconnu. Viticulture de réputation internationale."},"geometry":{"type":"Polygon","coordinates":[[[2.87,42.98],[2.97,42.98],[2.97,42.92],[2.89,42.90],[2.84,42.93],[2.87,42.98]]]}},
+    {"type":"Feature","properties":{"id":"lapalme","n":"La Palme","pop":890,"area":"2 640 ha","immo":"1 780€/m²","chom":"8.0%","type":"Littoral","tags":[["Étang","cy"],["Littoral","or"]],"note":"Commune littorale avec étang de La Palme. Accès mer et nature."},"geometry":{"type":"Polygon","coordinates":[[[2.92,43.02],[3.00,43.02],[3.00,42.97],[2.93,42.96],[2.89,42.99],[2.92,43.02]]]}},
+    {"type":"Feature","properties":{"id":"caves","n":"Caves","pop":485,"area":"3 480 ha","immo":"1 420€/m²","chom":"9.2%","type":"Viticole","tags":[["Rural","or"],["Corbières","ve"]],"note":"Commune viticole entre Corbières et littoral."},"geometry":{"type":"Polygon","coordinates":[[[2.79,42.98],[2.89,42.98],[2.89,42.92],[2.81,42.90],[2.77,42.93],[2.79,42.98]]]}},
+    {"type":"Feature","properties":{"id":"peyriac","n":"Peyriac-de-Mer","pop":1175,"area":"5 280 ha","immo":"1 920€/m²","chom":"8.0%","type":"Étangs","tags":[["Étang","cy"],["Pêche","or"]],"note":"Village de pêcheurs sur l'étang de Bages-Sigean. Patrimoine naturel classé."},"geometry":{"type":"Polygon","coordinates":[[[2.88,43.06],[2.97,43.06],[2.97,43.00],[2.89,42.99],[2.85,43.02],[2.88,43.06]]]}},
+    {"type":"Feature","properties":{"id":"bages","n":"Bages","pop":1050,"area":"3 125 ha","immo":"2 100€/m²","chom":"7.8%","type":"Étangs","tags":[["Village prestige","or"],["Étang","cy"]],"note":"Village perché sur l'étang de Bages. Architecture remarquable, attrait résidentiel haut de gamme."},"geometry":{"type":"Polygon","coordinates":[[[2.99,43.10],[3.06,43.10],[3.07,43.05],[2.99,43.04],[2.96,43.07],[2.99,43.10]]]}},
+    {"type":"Feature","properties":{"id":"armissan","n":"Armissan","pop":1128,"area":"2 450 ha","immo":"1 580€/m²","chom":"8.5%","type":"Viticole","tags":[["Viticulture","ve"],["La Clape","or"]],"note":"Au pied de la Montagne de la Clape. AOC La Clape, viticulture de qualité."},"geometry":{"type":"Polygon","coordinates":[[[3.04,43.16],[3.12,43.16],[3.13,43.10],[3.05,43.09],[3.01,43.12],[3.04,43.16]]]}},
+    {"type":"Feature","properties":{"id":"fleury","n":"Fleury","pop":2140,"area":"4 820 ha","immo":"1 850€/m²","chom":"9.1%","type":"Littoral","tags":[["Vendres plage","cy"],["Tourisme","or"]],"note":"Commune avec accès mer (Vendres). Tourisme balnéaire secondaire."},"geometry":{"type":"Polygon","coordinates":[[[3.09,43.18],[3.17,43.18],[3.18,43.12],[3.12,43.10],[3.08,43.13],[3.09,43.18]]]}},
+    {"type":"Feature","properties":{"id":"saintmarcel","n":"Saint-Marcel","pop":1840,"area":"2 180 ha","immo":"1 620€/m²","chom":"9.0%","type":"Périurbain","tags":[["Résidentiel","or"]],"note":"Commune périurbaine résidentielle."},"geometry":{"type":"Polygon","coordinates":[[[3.07,43.24],[3.15,43.24],[3.16,43.18],[3.09,43.17],[3.05,43.20],[3.07,43.24]]]}},
+    {"type":"Feature","properties":{"id":"stemariemerh","n":"Ste-Marie-la-Mer","pop":820,"area":"1 680 ha","immo":"2 200€/m²","chom":"7.2%","type":"Littoral","tags":[["Plage","cy"],["Résidences 2nd","or"]],"note":"Commune littorale. Fort taux de résidences secondaires. Économie touristique."},"geometry":{"type":"Polygon","coordinates":[[[3.14,43.26],[3.22,43.26],[3.22,43.20],[3.15,43.19],[3.11,43.22],[3.14,43.26]]]}},
+    {"type":"Feature","properties":{"id":"vinassan","n":"Vinassan","pop":2890,"area":"1 245 ha","immo":"1 620€/m²","chom":"8.9%","type":"Périurbain","tags":[["Résidentiel","or"]],"note":"Commune périurbaine en croissance. Bonne desserte routière."},"geometry":{"type":"Polygon","coordinates":[[[2.88,43.16],[2.97,43.16],[2.97,43.10],[2.89,43.09],[2.85,43.12],[2.88,43.16]]]}},
+    {"type":"Feature","properties":{"id":"moussan","n":"Moussan","pop":3680,"area":"1 980 ha","immo":"1 700€/m²","chom":"9.4%","type":"Périurbain","tags":[["Résidentiel","or"],["Croissance","ve"]],"note":"Commune périurbaine dynamique. Fort développement résidentiel ces 10 dernières années."},"geometry":{"type":"Polygon","coordinates":[[[2.88,43.22],[2.97,43.22],[2.97,43.16],[2.89,43.15],[2.85,43.18],[2.88,43.22]]]}},
+    {"type":"Feature","properties":{"id":"canet","n":"Canet-d'Aude","pop":2190,"area":"1 890 ha","immo":"1 640€/m²","chom":"9.6%","type":"Périurbain","tags":[["Résidentiel","or"]],"note":"Commune périurbaine au nord de Narbonne."},"geometry":{"type":"Polygon","coordinates":[[[2.76,43.22],[2.86,43.22],[2.86,43.16],[2.78,43.15],[2.73,43.18],[2.76,43.22]]]}},
+    {"type":"Feature","properties":{"id":"coursan2","n":"Névian","pop":1245,"area":"2 780 ha","immo":"1 520€/m²","chom":"8.5%","type":"Viticole","tags":[["Viticulture","ve"],["Périurbain","or"]],"note":"Commune viticole proche de Narbonne."},"geometry":{"type":"Polygon","coordinates":[[[2.98,43.16],[3.06,43.16],[3.07,43.10],[2.99,43.09],[2.95,43.12],[2.98,43.16]]]}},
+    {"type":"Feature","properties":{"id":"marcorignan","n":"Marcorignan","pop":1560,"area":"2 340 ha","immo":"1 580€/m²","chom":"8.8%","type":"Viticole","tags":[["Résidentiel","or"],["Viticulture","ve"]],"note":"Commune viticole et résidentielle en croissance."},"geometry":{"type":"Polygon","coordinates":[[[2.97,43.22],[3.05,43.22],[3.06,43.16],[2.98,43.15],[2.94,43.18],[2.97,43.22]]]}},
+    {"type":"Feature","properties":{"id":"montredon","n":"Montredon","pop":980,"area":"3 250 ha","immo":"1 500€/m²","chom":"8.9%","type":"Viticole","tags":[["La Clape","or"],["Viticulture","ve"]],"note":"Montagne de la Clape. Viticulture AOC La Clape, paysages remarquables."},"geometry":{"type":"Polygon","coordinates":[[[3.05,43.22],[3.13,43.22],[3.14,43.16],[3.06,43.15],[3.02,43.18],[3.05,43.22]]]}},
+    {"type":"Feature","properties":{"id":"bizanet","n":"Bizanet","pop":1380,"area":"3 420 ha","immo":"1 520€/m²","chom":"8.3%","type":"Viticole","tags":[["Viticulture","ve"],["Rural","or"]],"note":"Commune viticole des Corbières. AOC Corbières."},"geometry":{"type":"Polygon","coordinates":[[[2.78,43.16],[2.88,43.16],[2.88,43.10],[2.80,43.09],[2.75,43.12],[2.78,43.16]]]}},
+    {"type":"Feature","properties":{"id":"fabrezan","n":"Fabrezan","pop":1285,"area":"2 890 ha","immo":"1 450€/m²","chom":"8.7%","type":"Viticole","tags":[["Viticulture","ve"],["Bourg","or"]],"note":"Bourg viticole des Corbières. Services de proximité."},"geometry":{"type":"Polygon","coordinates":[[[2.68,43.16],[2.78,43.16],[2.78,43.10],[2.70,43.09],[2.65,43.12],[2.68,43.16]]]}},
+    {"type":"Feature","properties":{"id":"ferrals","n":"Ferrals-les-C.","pop":980,"area":"4 560 ha","immo":"1 400€/m²","chom":"9.1%","type":"Viticole","tags":[["Rural","or"],["Corbières","ve"]],"note":"Corbières viticoles."},"geometry":{"type":"Polygon","coordinates":[[[2.58,43.16],[2.68,43.16],[2.68,43.10],[2.60,43.09],[2.55,43.12],[2.58,43.16]]]}},
+    {"type":"Feature","properties":{"id":"thezan","n":"Thézan-des-C.","pop":890,"area":"3 680 ha","immo":"1 420€/m²","chom":"8.6%","type":"Viticole","tags":[["Viticulture","ve"],["Corbières","or"]],"note":"Corbières viticoles. Cave coopérative."},"geometry":{"type":"Polygon","coordinates":[[[2.68,43.22],[2.78,43.22],[2.78,43.16],[2.70,43.15],[2.65,43.18],[2.68,43.22]]]}},
+    {"type":"Feature","properties":{"id":"durban","n":"Durban-Corbières","pop":720,"area":"5 840 ha","immo":"1 400€/m²","chom":"9.5%","type":"Viticole","tags":[["Château","or"],["Corbières","ve"]],"note":"Château médiéval remarquable. AOC Corbières."},"geometry":{"type":"Polygon","coordinates":[[[2.78,43.10],[2.88,43.10],[2.88,43.04],[2.80,43.03],[2.75,43.06],[2.78,43.10]]]}},
+    {"type":"Feature","properties":{"id":"roquefort","n":"Roquefort-des-C.","pop":685,"area":"4 380 ha","immo":"1 360€/m²","chom":"9.3%","type":"Viticole","tags":[["Rural","or"]],"note":"Commune viticole des Corbières extérieures."},"geometry":{"type":"Polygon","coordinates":[[[2.68,43.10],[2.78,43.10],[2.78,43.04],[2.70,43.03],[2.65,43.06],[2.68,43.10]]]}},
+    {"type":"Feature","properties":{"id":"coustouge","n":"Coustouge","pop":285,"area":"3 210 ha","immo":"1 280€/m²","chom":"9.5%","type":"Rural","tags":[["Rural","or"]],"note":"Petite commune rurale des Corbières."},"geometry":{"type":"Polygon","coordinates":[[[2.58,43.10],[2.68,43.10],[2.68,43.04],[2.60,43.03],[2.55,43.06],[2.58,43.10]]]}},
+    {"type":"Feature","properties":{"id":"villeseque","n":"Villesèque-des-C.","pop":542,"area":"4 120 ha","immo":"1 350€/m²","chom":"9.0%","type":"Viticole","tags":[["Rural","or"]],"note":"Commune rurale en Corbières."},"geometry":{"type":"Polygon","coordinates":[[[2.68,43.28],[2.78,43.28],[2.78,43.22],[2.70,43.21],[2.65,43.24],[2.68,43.28]]]}},
+    {"type":"Feature","properties":{"id":"mailhac","n":"Mailhac","pop":685,"area":"3 125 ha","immo":"1 380€/m²","chom":"9.2%","type":"Viticole","tags":[["Rural","or"],["Viticulture","ve"]],"note":"Petit village viticole. Site archéologique notable."},"geometry":{"type":"Polygon","coordinates":[[[2.58,43.22],[2.68,43.22],[2.68,43.16],[2.60,43.15],[2.55,43.18],[2.58,43.22]]]}},
+    {"type":"Feature","properties":{"id":"ornaisons","n":"Ornaisons","pop":1045,"area":"2 890 ha","immo":"1 480€/m²","chom":"8.1%","type":"Viticole","tags":[["Viticulture","ve"]],"note":"Corbières viticoles. Coopérative viticole active."},"geometry":{"type":"Polygon","coordinates":[[[2.78,43.22],[2.88,43.22],[2.88,43.16],[2.80,43.15],[2.75,43.18],[2.78,43.22]]]}},
+    {"type":"Feature","properties":{"id":"montseret","n":"Montséret","pop":398,"area":"2 240 ha","immo":"1 320€/m²","chom":"8.8%","type":"Viticole","tags":[["Rural","or"]],"note":"Commune rurale viticole des Corbières."},"geometry":{"type":"Polygon","coordinates":[[[2.88,43.28],[2.97,43.28],[2.97,43.22],[2.89,43.21],[2.85,43.24],[2.88,43.28]]]}},
+    {"type":"Feature","properties":{"id":"davejean","n":"Davejean","pop":248,"area":"3 850 ha","immo":"1 260€/m²","chom":"9.8%","type":"Rural","tags":[["Rural","or"]],"note":"Commune rurale à l'est des Corbières."},"geometry":{"type":"Polygon","coordinates":[[[2.58,43.04],[2.68,43.04],[2.68,42.98],[2.60,42.97],[2.55,43.00],[2.58,43.04]]]}},
+    {"type":"Feature","properties":{"id":"villeneuve","n":"Villeneuve-les-C.","pop":628,"area":"5 120 ha","immo":"1 340€/m²","chom":"9.8%","type":"Viticole","tags":[["Rural","or"]],"note":"Corbières. Commune rurale viticole."},"geometry":{"type":"Polygon","coordinates":[[[2.68,43.04],[2.78,43.04],[2.78,42.98],[2.70,42.97],[2.65,43.00],[2.68,43.04]]]}},
+    {"type":"Feature","properties":{"id":"nevian","n":"Névian","pop":1245,"area":"2 780 ha","immo":"1 520€/m²","chom":"8.5%","type":"Viticole","tags":[["Viticulture","ve"],["Périurbain","or"]],"note":"Commune viticole proche de Narbonne."},"geometry":{"type":"Polygon","coordinates":[[[2.88,43.10],[2.97,43.10],[2.97,43.04],[2.89,43.03],[2.85,43.06],[2.88,43.10]]]}}
+  ]
+};
+
+/* ── CARTE LEAFLET — Initialisation ─── */
+let leafletMap = null;
+let geoLayer = null;
+let selectedLayer = null;
+
+const CHOM_COLOR = (v) => {
+  const n = parseFloat(v);
+  if(n > 10) return '#C0444E';
+  if(n > 8.5) return '#C9A84C';
+  return '#3CAF72';
+};
+
+const FILL_DEFAULT  = 'rgba(201,168,76,0.06)';
+const FILL_HOVER    = 'rgba(201,168,76,0.18)';
+const FILL_SELECTED = 'rgba(201,168,76,0.24)';
+const STROKE        = 'rgba(201,168,76,0.35)';
+const STROKE_SEL    = '#C9A84C';
+
+function styleFeature(feature) {
+  const id = feature.properties.id;
+  const isMain = id === 'narbonne';
+  const isCoast = ['gruissan','portlanouvelle','leucate','fleury','stemariemerh'].includes(id);
+  return {
+    fillColor: FILL_DEFAULT,
+    fillOpacity: 1,
+    color: isMain ? 'rgba(201,168,76,0.6)' : isCoast ? 'rgba(56,180,204,0.35)' : STROKE,
+    weight: isMain ? 1.4 : 0.8,
+    dashArray: null
+  };
+}
+
+function buildPopup(p) {
+  const chomColor = CHOM_COLOR(p.chom);
+  const tags = (p.tags||[]).map(([t,c])=>{
+    const col = c==='cy'?'#38B4CC':c==='ro'?'#C0444E':c==='ve'?'#3CAF72':'#C9A84C';
+    return `<span style="font-size:.58rem;padding:.15rem .5rem;border:1px solid ${col}40;color:${col};border-radius:2px;margin-right:4px">${t}</span>`;
+  }).join('');
+  return `
+    <div class="lf-popup-name">${p.n}</div>
+    <div style="margin-bottom:8px">${tags}</div>
+    <div class="lf-popup-row"><span>${p.type}</span></div>
+    <div class="lf-popup-row"><span>Population</span><span class="lf-popup-val">${(p.pop||0).toLocaleString('fr-FR')} hab.</span></div>
+    <div class="lf-popup-row"><span>Superficie</span><span class="lf-popup-val">${p.area}</span></div>
+    <div class="lf-popup-row"><span>Immo</span><span class="lf-popup-val">${p.immo}</span></div>
+    <div class="lf-popup-row"><span>Chômage</span><span class="lf-popup-val" style="color:${chomColor}">${p.chom}</span></div>
+    ${p.note ? `<div class="lf-popup-note">${p.note}</div>` : ''}
+  `;
+}
+
+function initLeafletMap() {
+  const container = document.getElementById('leaflet-map');
+  if(!container || leafletMap) return;
+
+  leafletMap = L.map('leaflet-map', {
+    center: [43.08, 2.90],
+    zoom: 10,
+    zoomControl: true,
+    attributionControl: true,
+    scrollWheelZoom: true
+  });
+
+  // Tuile sombre — CartoDB Dark Matter
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CartoDB',
+    subdomains: 'abcd',
+    maxZoom: 16,
+    opacity: 0.6
+  }).addTo(leafletMap);
+
+  geoLayer = L.geoJSON(GN_GEOJSON, {
+    style: styleFeature,
+    onEachFeature: (feature, layer) => {
+      const p = feature.properties;
+
+      layer.on('mouseover', function() {
+        if(layer !== selectedLayer) {
+          layer.setStyle({ fillColor: FILL_HOVER, fillOpacity: 1 });
+        }
+        layer.bringToFront();
+      });
+
+      layer.on('mouseout', function() {
+        if(layer !== selectedLayer) {
+          geoLayer.resetStyle(layer);
+        }
+      });
+
+      layer.on('click', function() {
+        // Reset ancien sélectionné
+        if(selectedLayer && selectedLayer !== layer) {
+          geoLayer.resetStyle(selectedLayer);
+        }
+        selectedLayer = layer;
+        layer.setStyle({
+          fillColor: FILL_SELECTED, fillOpacity: 1,
+          color: STROKE_SEL, weight: 1.6
+        });
+        layer.bindPopup(buildPopup(p), {
+          maxWidth: 260,
+          className: 'lf-custom-popup'
+        }).openPopup();
+      });
+    }
+  }).addTo(leafletMap);
+
+  // Narbonne label
+  L.marker([43.13, 2.98], {
+    icon: L.divIcon({
+      html: '<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:rgba(201,168,76,0.7);letter-spacing:.15em;white-space:nowrap;pointer-events:none">NARBONNE</div>',
+      className: '', iconAnchor: [30, 6]
+    })
+  }).addTo(leafletMap);
+
+  // Fit bounds
+  leafletMap.fitBounds(geoLayer.getBounds(), { padding: [20, 20] });
+}
 
 /* ── MODULE CARTE COMMUNES DASHBOARD ──── */
 const COM_DATA = {
@@ -1270,6 +1476,181 @@ window.addEventListener('load', () => {
     el.addEventListener('mouseleave', () => el.classList.remove('hovered'));
   });
 });
+
+
+/* ── CARTE LEAFLET GRAND NARBONNE ─────── */
+function initLeafletMap() {
+  if(!document.getElementById('leaflet-map')) return;
+  if(window._leafletMapInit) return;
+  window._leafletMapInit = true;
+
+  // Charger Leaflet dynamiquement
+  function loadLeaflet(cb) {
+    if(window.L) { cb(); return; }
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    document.head.appendChild(css);
+
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    script.onload = cb;
+    document.head.appendChild(script);
+  }
+
+  loadLeaflet(() => {
+    const map = L.map('leaflet-map', {
+      center: [43.18, 3.01],
+      zoom: 10,
+      zoomControl: true,
+      scrollWheelZoom: true,
+    });
+
+    // Tiles sombres — CartoDB Dark Matter
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap © CartoDB',
+      maxZoom: 14,
+    }).addTo(map);
+
+    // Données des communes
+    const COMMUNES = {
+      "Narbonne":{"pop":57765,"immo":"2 450€/m²","chom":"10.8%","type":"Ville-centre"},
+      "Gruissan":{"pop":5087,"immo":"3 200€/m²","chom":"8.2%","type":"Littoral"},
+      "Port-la-Nouvelle":{"pop":5843,"immo":"1 950€/m²","chom":"12.1%","type":"Port industriel"},
+      "Coursan":{"pop":6014,"immo":"1 750€/m²","chom":"9.8%","type":"Périurbain"},
+      "Leucate":{"pop":4380,"immo":"2 900€/m²","chom":"7.5%","type":"Littoral"},
+      "Cuxac-d'Aude":{"pop":4512,"immo":"1 680€/m²","chom":"9.2%","type":"Périurbain"},
+      "Sigean":{"pop":4722,"immo":"1 820€/m²","chom":"10.2%","type":"Étangs"},
+      "Bages":{"pop":1050,"immo":"2 100€/m²","chom":"7.8%","type":"Étangs"},
+      "Vinassan":{"pop":2890,"immo":"1 620€/m²","chom":"8.9%","type":"Périurbain"},
+      "Armissan":{"pop":1128,"immo":"1 580€/m²","chom":"8.5%","type":"Viticole"},
+      "Fleury":{"pop":2140,"immo":"1 850€/m²","chom":"9.1%","type":"Littoral"},
+      "Moussan":{"pop":3680,"immo":"1 700€/m²","chom":"9.4%","type":"Périurbain"},
+      "Peyriac-de-Mer":{"pop":1175,"immo":"1 920€/m²","chom":"8.0%","type":"Étangs"},
+      "Canet-d'Aude":{"pop":2190,"immo":"1 640€/m²","chom":"9.6%","type":"Périurbain"},
+      "Bizanet":{"pop":1380,"immo":"1 520€/m²","chom":"8.3%","type":"Viticole"},
+      "Ornaisons":{"pop":1045,"immo":"1 480€/m²","chom":"8.1%","type":"Viticole"},
+      "Mailhac":{"pop":685,"immo":"1 380€/m²","chom":"9.2%","type":"Viticole"},
+      "Montséret":{"pop":398,"immo":"1 320€/m²","chom":"8.8%","type":"Viticole"},
+      "Thézan-des-Corbières":{"pop":890,"immo":"1 420€/m²","chom":"8.6%","type":"Viticole"},
+      "Villesèque-des-Corbières":{"pop":542,"immo":"1 350€/m²","chom":"9.0%","type":"Viticole"},
+      "Durban-Corbières":{"pop":720,"immo":"1 400€/m²","chom":"9.5%","type":"Viticole"},
+      "Roquefort-des-Corbières":{"pop":685,"immo":"1 360€/m²","chom":"9.3%","type":"Viticole"},
+      "Villeneuve-les-Corbières":{"pop":628,"immo":"1 340€/m²","chom":"9.8%","type":"Viticole"},
+      "Fabrezan":{"pop":1285,"immo":"1 450€/m²","chom":"8.7%","type":"Viticole"},
+      "Ferrals-les-Corbières":{"pop":980,"immo":"1 400€/m²","chom":"9.1%","type":"Viticole"},
+      "Coustouge":{"pop":285,"immo":"1 280€/m²","chom":"9.5%","type":"Rural"},
+      "Davejean":{"pop":248,"immo":"1 260€/m²","chom":"9.8%","type":"Rural"},
+      "Fitou":{"pop":980,"immo":"1 680€/m²","chom":"8.4%","type":"Viticole"},
+      "La Palme":{"pop":890,"immo":"1 780€/m²","chom":"8.0%","type":"Littoral"},
+      "Caves":{"pop":485,"immo":"1 420€/m²","chom":"9.2%","type":"Viticole"},
+      "Névian":{"pop":1245,"immo":"1 520€/m²","chom":"8.5%","type":"Viticole"},
+      "Marcorignan":{"pop":1560,"immo":"1 580€/m²","chom":"8.8%","type":"Viticole"},
+      "Montredon-des-Corbières":{"pop":980,"immo":"1 500€/m²","chom":"8.9%","type":"Viticole"},
+      "Saint-Marcel-sur-Aude":{"pop":1840,"immo":"1 620€/m²","chom":"9.0%","type":"Périurbain"},
+      "Salles-d'Aude":{"pop":2140,"immo":"1 660€/m²","chom":"9.3%","type":"Viticole"},
+      "Sainte-Marie-la-Mer":{"pop":820,"immo":"2 200€/m²","chom":"7.2%","type":"Littoral"},
+    };
+
+    // Codes INSEE des 37 communes du Grand Narbonne
+    const CODES_INSEE = [
+      "11001","11009","11024","11039","11053","11074","11100","11103",
+      "11108","11120","11160","11173","11196","11206","11213","11222",
+      "11237","11241","11256","11261","11266","11268","11272","11280",
+      "11298","11317","11319","11327","11333","11357","11362","11369",
+      "11388","11394","11397","11414","11430"
+    ];
+
+    // Style par défaut communes
+    function getStyle(feature) {
+      const name = feature.properties.nom;
+      const isNarbonne = name === 'Narbonne';
+      return {
+        fillColor: isNarbonne ? 'rgba(184,150,62,0.25)' : 'rgba(184,150,62,0.06)',
+        fillOpacity: 1,
+        color: isNarbonne ? 'rgba(212,173,90,0.7)' : 'rgba(184,150,62,0.3)',
+        weight: isNarbonne ? 1.5 : 0.8,
+      };
+    }
+
+    function getHoverStyle() {
+      return {
+        fillColor: 'rgba(184,150,62,0.25)',
+        fillOpacity: 1,
+        color: 'rgba(212,173,90,0.85)',
+        weight: 1.5,
+      };
+    }
+
+    // Charger les données GeoJSON via l'API geo.api.gouv.fr
+    const codesDept = '11'; // Aude
+    fetch(`https://geo.api.gouv.fr/communes?codeDepartement=${codesDept}&fields=nom,code,contour&format=geojson&geometry=contour`)
+      .then(r => r.json())
+      .then(data => {
+        // Filtrer uniquement les communes du Grand Narbonne
+        data.features = data.features.filter(f => CODES_INSEE.includes(f.properties.code));
+
+        const geojsonLayer = L.geoJSON(data, {
+          style: getStyle,
+          onEachFeature: (feature, layer) => {
+            const name = feature.properties.nom;
+            const d = COMMUNES[name] || {};
+
+            // Tooltip au hover
+            layer.bindTooltip(`
+              <span class="tt-commune-name">${name}</span>
+              <div class="tt-commune-data">
+                Population : <span>${d.pop ? d.pop.toLocaleString('fr-FR') + ' hab.' : '—'}</span><br>
+                Immo : <span>${d.immo || '—'}</span><br>
+                Chômage : <span>${d.chom || '—'}</span><br>
+                Profil : <span>${d.type || '—'}</span>
+              </div>
+            `, { sticky: true, opacity: 1 });
+
+            // Hover events
+            layer.on({
+              mouseover: e => { e.target.setStyle(getHoverStyle()); e.target.bringToFront(); },
+              mouseout:  e => { geojsonLayer.resetStyle(e.target); },
+              click:     e => {
+                map.fitBounds(e.target.getBounds(), { padding: [30,30] });
+                if(window.showCommune) {
+                  // Trouver l'ID correspondant dans COM_DATA
+                  const id = Object.keys(window.COM_DATA || {}).find(k => 
+                    window.COM_DATA[k].n === name || window.COM_DATA[k].n.includes(name.split('-')[0])
+                  );
+                  if(id) showCommune(id);
+                }
+              }
+            });
+          }
+        }).addTo(map);
+
+        // Zoom sur le territoire
+        if(geojsonLayer.getBounds().isValid()) {
+          map.fitBounds(geojsonLayer.getBounds(), { padding: [20,20] });
+        }
+      })
+      .catch(err => {
+        console.warn('GeoJSON API non disponible, carte SVG en fallback', err);
+        document.getElementById('leaflet-map').innerHTML = 
+          '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(184,150,62,.4);font-family:JetBrains Mono;font-size:.7rem;letter-spacing:.1em">CARTE — CONNEXION REQUISE</div>';
+      });
+  });
+}
+
+// Initialiser la carte quand l'onglet "Données communes" est actif
+const _origRenderTab = window.renderTab || null;
+// Hook sur switchTab pour détecter l'onglet communes
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.tbtn');
+  if(btn && btn.textContent.includes('communes')) {
+    setTimeout(initLeafletMap, 100);
+  }
+});
+// Aussi au chargement si c'est déjà le bon onglet
+setTimeout(() => {
+  if(document.getElementById('leaflet-map')) initLeafletMap();
+}, 500);
 
 </script>
 </body>
