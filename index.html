@@ -805,18 +805,27 @@
       position: absolute;
       right: -2%; top: 0; bottom: 0;
       width: 56%;
-      pointer-events: none;
+      pointer-events: auto;
       z-index: 1;
-      overflow: visible;
+      overflow: hidden;
     }
-    .hero-map svg {
-      position: absolute;
-      right: 0; top: 50%;
-      transform: translateY(-50%);
-      width: 100%; height: auto;
-      opacity: 0;
-      animation: mapFadeIn 2.2s ease 1.2s forwards;
-      overflow: visible;
+    /* Leaflet hero custom */
+    #heroLeaflet .leaflet-container {
+      background: transparent !important;
+      cursor: crosshair;
+    }
+    #heroLeaflet .leaflet-control-zoom { display: none; }
+    #heroLeaflet .leaflet-control-attribution { display: none; }
+    #heroLeaflet .hero-tooltip {
+      background: rgba(8,9,12,0.88);
+      border: 1px solid rgba(201,168,76,0.35);
+      color: #C9A84C;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .1em;
+      padding: 4px 10px;
+      border-radius: 2px;
+      white-space: nowrap;
     }
     @keyframes mapFadeIn { 0%{opacity:0} 100%{opacity:1} }
 
@@ -894,12 +903,12 @@
     .map-txt-coord { fill: rgba(184,150,62,0.14); font-size: 4px; letter-spacing:.06em; }
 
     /* Masque de fondu sur les bords gauche/haut/bas */
-    .hero-map::before {
-      content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+    .hero-map::after {
+      content:''; position:absolute; inset:0; z-index:400; pointer-events:none;
       background:
-        linear-gradient(to right, var(--ink) 0%, rgba(8,9,12,.6) 18%, transparent 38%),
-        linear-gradient(to bottom, var(--ink) 0%, transparent 22%),
-        linear-gradient(to top,    var(--ink) 0%, transparent 22%);
+        linear-gradient(to right, var(--ink) 0%, rgba(8,9,12,.45) 15%, transparent 35%),
+        linear-gradient(to bottom, var(--ink) 0%, transparent 18%),
+        linear-gradient(to top,    var(--ink) 0%, transparent 18%);
     }
 
     /* Glow global derrière la carte */
@@ -1015,6 +1024,8 @@
       letter-spacing: .08em; margin-top: .3rem;
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
 
@@ -1102,166 +1113,12 @@
   </div>
 
 
-  <!-- ② CARTE SOMPTUEUSE — Grand Narbonne -->
+  <!-- ② CARTE LEAFLET — Grand Narbonne Hero -->
   <div class="hero-map" id="heroMap">
     <div class="map-glow"></div>
-    <svg viewBox="0 0 580 680" xmlns="http://www.w3.org/2000/svg" id="mapSvg" style="overflow:visible">
-      <defs>
-        <filter id="glow1" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="glow2" x="-80%" y="-80%" width="260%" height="260%">
-          <feGaussianBlur stdDeviation="6" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="glowCyan" x="-80%" y="-80%" width="260%" height="260%">
-          <feGaussianBlur stdDeviation="4" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-
-      <!-- ── Grille de coordonnées ── -->
-      <line class="ret" x1="0" y1="170" x2="580" y2="170"/>
-      <line class="ret" x1="0" y1="290" x2="580" y2="290"/>
-      <line class="ret" x1="0" y1="410" x2="580" y2="410"/>
-      <line class="ret" x1="0" y1="530" x2="580" y2="530"/>
-      <line class="ret" x1="100" y1="0" x2="100" y2="680"/>
-      <line class="ret" x1="220" y1="0" x2="220" y2="680"/>
-      <line class="ret" x1="340" y1="0" x2="340" y2="680"/>
-      <line class="ret" x1="460" y1="0" x2="460" y2="680"/>
-
-      <!-- ══════════════════════════════════════
-           COMMUNES DU GRAND NARBONNE
-           37 communes — formes géographiques réelles (simplifiées)
-           Organisation géographique N→S, O→E
-      ══════════════════════════════════════ -->
-
-      <!-- ZONE NORD-OUEST : Minervois / Corbières -->
-      <!-- Mailhac -->
-      <polygon class="com" data-n="Mailhac"         data-delay="0"    points="58,82  108,72  118,98  95,118  60,112"/>
-      <!-- Caunes-Minervois direction -->
-      <polygon class="com" data-n="Ornaisons"       data-delay="120"  points="108,72  162,65  172,92  148,115  118,110"/>
-      <!-- Bizanet -->
-      <polygon class="com" data-n="Bizanet"          data-delay="240"  points="162,65  212,60  220,88  198,112  172,108"/>
-      <!-- Montséret -->
-      <polygon class="com" data-n="Montséret"        data-delay="360"  points="212,60  262,55  270,84  248,108  222,104"/>
-      <!-- Thézan-des-Corbières -->
-      <polygon class="com" data-n="Thézan-des-C."   data-delay="480"  points="262,55  315,52  322,80  300,105  272,100"/>
-      <!-- Villesèque-des-C. -->
-      <polygon class="com" data-n="Villesèque"       data-delay="600"  points="315,52  368,50  374,78  350,102  322,98"/>
-      <!-- Durban-Corbières -->
-      <polygon class="com" data-n="Durban-C."        data-delay="720"  points="368,50  420,48  428,76  405,100  374,96"/>
-      <!-- Roquefort-des-C. -->
-      <polygon class="com" data-n="Roquefort-des-C." data-delay="840" points="420,48  472,46  478,74  458,98  428,94"/>
-      <!-- Villeneuve-les-C. -->
-      <polygon class="com" data-n="Villeneuve-les-C." data-delay="960" points="472,46  524,48  528,76  506,100  478,96"/>
-
-      <!-- ZONE NORD : arc intérieur -->
-      <polygon class="com" data-n="Canet-d'Aude"    data-delay="80"   points="58,112  95,118  100,152  72,168  45,155"/>
-      <polygon class="com" data-n="Moussan"          data-delay="200"  points="95,118  148,115  152,148  122,168  100,160"/>
-      <polygon class="com" data-n="Névian"           data-delay="320"  points="148,115  198,112  202,145  172,168  152,155"/>
-      <polygon class="com" data-n="Marcorignan"      data-delay="440"  points="198,112  248,108  252,142  222,165  202,158"/>
-      <polygon class="com" data-n="Montredon"        data-delay="560"  points="248,108  300,105  304,138  274,162  252,156"/>
-      <polygon class="com" data-n="Fabrezan"         data-delay="680"  points="300,105  350,102  354,136  324,160  304,154"/>
-      <polygon class="com" data-n="Ferrals-les-C."  data-delay="800"  points="350,102  405,100  408,134  378,158  354,152"/>
-      <polygon class="com" data-n="Coustouge"        data-delay="920"  points="405,100  458,98  460,132  432,156  408,150"/>
-      <polygon class="com" data-n="Davejean"         data-delay="1040" points="458,98  524,100  525,134  495,158  460,150"/>
-
-      <!-- ZONE CENTRALE : ceinture de Narbonne -->
-      <polygon class="com" data-n="Vinassan"         data-delay="150"  points="45,155  72,168  68,205  40,215  22,195"/>
-      <polygon class="com" data-n="Coursan"          data-delay="270"  points="72,168  122,168  120,205  88,222  68,210"/>
-      <polygon class="com" data-n="Cuxac-d'Aude"    data-delay="390"  points="122,168  172,168  170,205  138,222  120,210"/>
-      <polygon class="com" data-n="Salles-d'Aude"   data-delay="510"  points="172,168  222,165  220,202  188,220  170,210"/>
-
-      <!-- NARBONNE — commune principale, forme précise -->
-      <polygon class="com com-main" data-n="Narbonne" data-delay="50"
-               points="222,165 274,162 278,198 268,240 238,265 200,268 170,248 165,210 188,190"/>
-
-      <polygon class="com" data-n="Armissan"         data-delay="630"  points="274,162  324,160  322,196  292,215  278,205"/>
-      <polygon class="com" data-n="Bages"            data-delay="750"  points="324,160  378,158  375,194  345,213  322,208"/>
-      <polygon class="com" data-n="Peyriac-de-Mer"  data-delay="870"  points="378,158  432,156  428,192  398,212  375,206"/>
-      <polygon class="com" data-n="Sigean"           data-delay="990"  points="432,156  495,158  490,195  460,215  428,208"/>
-
-      <!-- ZONE SUD-OUEST : étangs intérieurs -->
-      <polygon class="com" data-n="Fleury"           data-delay="300"  points="40,215  68,210  65,250  38,265  18,248"/>
-      <polygon class="com" data-n="Saint-Marcel"     data-delay="420"  points="68,210  120,210  118,248  85,265  65,255"/>
-      <polygon class="com" data-n="Sainte-Marie-la-Mer" data-delay="180" points="120,210 170,210 168,250 135,268 118,255"/>
-
-      <!-- GRUISSAN — littoral -->
-      <polygon class="com com-coast" data-n="Gruissan" data-delay="220"
-               points="135,268 170,260 200,268 205,308 178,332 142,328 120,305 115,280"/>
-
-      <!-- ZONE SUD : littoral méditerranéen -->
-      <polygon class="com" data-n="Leucate"          data-delay="1100" points="490,195  545,198  548,238  518,258  490,250"/>
-      <polygon class="com" data-n="La Palme"         data-delay="1000" points="460,215  490,210  492,252  462,272  438,262"/>
-      <polygon class="com com-coast" data-n="Port-la-Nouvelle" data-delay="550"
-               points="238,265 268,258 278,298 265,332 235,342 210,325 205,295"/>
-      <polygon class="com" data-n="Caves"            data-delay="1150" points="428,208  462,205  462,242  432,260  408,250"/>
-      <polygon class="com" data-n="Fitou"            data-delay="1200" points="460,242  490,240  492,278  462,298  440,285"/>
-      <polygon class="com" data-n="Leucate-sud"      data-delay="1250" points="490,250  518,248  520,285  495,305  468,295"/>
-
-      <!-- ══ BEACON NARBONNE ══ -->
-      <g id="beaconNarbo" filter="url(#glow2)" transform="translate(222, 220)">
-        <circle class="beacon-ring"  cx="0" cy="0" r="5"/>
-        <circle class="beacon-ring beacon-ring2" cx="0" cy="0" r="5"/>
-        <circle class="beacon-dot"   cx="0" cy="0" r="3.5"/>
-        <circle cx="0" cy="0" r="1.2" fill="#FFF8E0" opacity=".9"/>
-      </g>
-
-      <!-- Beacon Port-la-Nouvelle -->
-      <g filter="url(#glowCyan)" transform="translate(240, 318)" style="opacity:0;animation:secPulse 4s 2s infinite ease-in-out">
-        <circle class="beacon-sec" cx="0" cy="0" r="2.8"/>
-        <circle cx="0" cy="0" r="1" fill="#E8F8FF" opacity=".8"/>
-      </g>
-
-      <!-- Beacon Gruissan -->
-      <g filter="url(#glowCyan)" transform="translate(158, 300)" style="opacity:0;animation:secPulse 4s 2.8s infinite ease-in-out">
-        <circle class="beacon-sec" cx="0" cy="0" r="2.2"/>
-        <circle cx="0" cy="0" r="0.8" fill="#E8F8FF" opacity=".7"/>
-      </g>
-
-      <!-- Beacon Leucate -->
-      <g filter="url(#glowCyan)" transform="translate(515, 220)" style="opacity:0;animation:secPulse 4s 3.2s infinite ease-in-out">
-        <circle class="beacon-sec" cx="0" cy="0" r="2"/>
-        <circle cx="0" cy="0" r="0.7" fill="#E8F8FF" opacity=".6"/>
-      </g>
-
-      <!-- ══ LABELS ══ -->
-      <text class="map-txt" x="222" y="228" text-anchor="middle" style="font-size:6px;fill:rgba(212,173,90,.65)">NARBONNE</text>
-      <text class="map-txt" x="240" y="352" text-anchor="middle" style="font-size:5px">PORT-LA-NOUVELLE</text>
-      <text class="map-txt" x="155" y="344" text-anchor="middle" style="font-size:5px">GRUISSAN</text>
-      <text class="map-txt" x="515" y="270" text-anchor="middle" style="font-size:5px">LEUCATE</text>
-
-      <!-- Label territoire -->
-      <text class="map-txt" x="290" y="28" text-anchor="middle"
-            style="font-size:8px;fill:rgba(184,150,62,.22);letter-spacing:.35em">GRAND NARBONNE</text>
-      <text class="map-txt-dim" x="290" y="40" text-anchor="middle"
-            style="letter-spacing:.2em">37 COMMUNES · AUDE · OCCITANIE</text>
-
-      <!-- Coordonnées coins -->
-      <text class="map-txt-coord" x="8" y="672">43°02′N</text>
-      <text class="map-txt-coord" x="8" y="680">2°51′E</text>
-      <text class="map-txt-coord" x="490" y="672">43°28′N</text>
-      <text class="map-txt-coord" x="490" y="680">3°12′E</text>
-
-      <!-- Petite boussole -->
-      <g transform="translate(548, 65)" opacity=".3">
-        <circle cx="0" cy="0" r="10" fill="none" stroke="rgba(184,150,62,.3)" stroke-width=".5"/>
-        <text x="0" y="-14" text-anchor="middle" class="map-txt-coord" style="fill:rgba(184,150,62,.5)">N</text>
-        <line x1="0" y1="-8" x2="0" y2="8" stroke="rgba(184,150,62,.4)" stroke-width=".6"/>
-        <line x1="-8" y1="0" x2="8" y2="0" stroke="rgba(184,150,62,.25)" stroke-width=".4"/>
-        <polygon points="0,-8 2,0 0,-2 -2,0" fill="rgba(212,173,90,.6)"/>
-      </g>
-
-      <!-- Ligne côtière stylisée -->
-      <path d="M115,280 Q130,320 142,328 Q160,340 178,332 Q200,340 210,325 Q225,342 238,342 Q255,348 265,332 Q275,315 278,298"
-            fill="none" stroke="rgba(80,200,232,0.12)" stroke-width="1.5" stroke-dasharray="4 6"/>
-
-      <!-- Mention mer -->
-      <text class="map-txt-coord" x="85" y="370" style="fill:rgba(80,200,232,.18);letter-spacing:.12em">MER MÉDITERRANÉE</text>
-    </svg>
+    <div id="heroLeaflet" style="width:100%;height:100%;opacity:0;animation:mapFadeIn 2.2s ease 1.2s forwards;border-radius:4px;"></div>
   </div>
+
 </section>
 
 <!-- TICKER -->
